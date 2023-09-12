@@ -10,7 +10,9 @@ env_logger = "0.10.0"
 futures = "0.3.28"
 lazy_static = "1.4.0"
 log = "0.4.20"
+mime_guess = "2.0.4"
 navigator-rs = "0.2.1"
+rust-embed = "8.0.0"
 serde = { version = "1.0.188", features = ["derive"] }
 serde_json = "1.0.105"
 tokio = { version = "1.32.0", features = ["full"] }
