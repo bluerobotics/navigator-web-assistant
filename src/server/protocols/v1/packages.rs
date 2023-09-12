@@ -78,7 +78,7 @@ pub mod package {
                     value: Value::Array(hardware_manager::read_accel().into()),
                 }),
                 Sensors::Gyroscope => package.readings.sensors.push(Sensor {
-                    sensor_type: "magnetometer".to_string(),
+                    sensor_type: "gyroscope".to_string(),
                     unit: "rad/s".to_string(),
                     value: Value::Array(hardware_manager::read_gyro().into()),
                 }),
