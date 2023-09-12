@@ -9,7 +9,9 @@ pub async fn run() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .service(protocols::v1::rest::hello)
             .service(protocols::v1::rest::echo)
-            .service(protocols::v1::rest::sensor)
+            .service(protocols::v1::rest::post_pwm_enable)
+            .service(protocols::v1::rest::post_pwm_frequency)
+            .service(protocols::v1::rest::post_pwm)
     });
 
     server.bind(("0.0.0.0", 8080))?.run().await
