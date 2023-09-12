@@ -36,6 +36,21 @@ pub mod package {
         }
     }
 
+    pub fn pwm_channel_value(channel: hardware_manager::PwmChannel, value: u16) -> String {
+        hardware_manager::set_pwm_channel_value(channel, value);
+        "success".to_string()
+    }
+
+    pub fn pwm_enable(state: bool) -> String {
+        hardware_manager::pwm_enable(state);
+        "success".to_string()
+    }
+
+    pub fn set_pwm_freq_hz(freq: f32) -> String {
+        hardware_manager::set_pwm_freq_hz(freq);
+        "success".to_string()
+    }
+
     pub fn reading(selection: Sensors) -> SensorReading {
         let mut package: SensorReading = Default::default();
         package.readings.timestamp = chrono::Utc::now().to_string();
