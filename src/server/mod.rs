@@ -12,5 +12,5 @@ pub async fn run() -> std::io::Result<()> {
             .service(protocols::v1::rest::sensor)
     });
 
-    server.bind(("127.0.0.1", 8080))?.run().await
+    server.bind(("0.0.0.0", 8080))?.run().await
 }
