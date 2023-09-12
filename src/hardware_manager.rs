@@ -94,7 +94,6 @@ impl From<navigator_rs::ADCData> for ADCData {
     }
 }
 
-
 pub enum PwmChannel {
     Ch1,
     Ch2,
@@ -154,6 +153,18 @@ pub fn read_altitude() -> f32 {
 
 pub fn read_adc_all() -> ADCData {
     with_navigator!().read_adc_all().into()
+}
+
+pub fn set_pwm_channel_value(channel: PwmChannel, value: u16) {
+    with_navigator!().set_pwm_channel_value(channel.into(), value)
+}
+
+pub fn set_pwm_freq_hz(freq: f32) {
+    with_navigator!().set_pwm_freq_hz(freq)
+}
+
+pub fn pwm_enable(state: bool) {
+    with_navigator!().pwm_enable(state)
 }
 
 impl From<AxisData> for Vec<f32> {
