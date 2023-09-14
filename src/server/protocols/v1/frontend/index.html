@@ -88,8 +88,8 @@
                     <legend>Sensors</legend>
                     <fieldset>
                         <legend>Update Control</legend>
-                        <label for="update-interval">Update Interval (seconds):</label>
-                        <input type="number" id="update-interval" value="10" />
+                        <label for="update-interval">Update Interval (ms):</label>
+                        <input type="number" id="update-interval" value="10000" />
                         <button id="start-update">Start Update</button>
                         <button id="stop-update" disabled>Stop Update</button>
                     </fieldset>
@@ -208,17 +208,16 @@
                         const valueCell = row.insertCell(1);
                         const unitCell = row.insertCell(2);
 
-                        sensorTypeCell.textContent = sensor.sensor_type;
+                        sensorTypeCell.textContent = sensor.type;
                         unitCell.textContent = sensor.unit;
-
-                        if (Array.isArray(sensor.value.Array)) {
-                            const roundedValues = sensor.value.Array.map((val) =>
-                                parseFloat(val).toFixed(2)
-                            );
+                        if (Array.isArray(sensor.value)) {
+                            const roundedValues = sensor.value.map(val => val.toFixed(2));
                             valueCell.textContent = roundedValues.join(", ");
+
                         } else {
-                            valueCell.textContent = sensor.value.Single;
+                            valueCell.textContent = sensor.value.toFixed(2);
                         }
+
                     });
                 })
                 .catch((error) => {
@@ -232,7 +231,7 @@
                 10
             );
             updateSensorReadings(); // Initial update
-            updateIntervalId = setInterval(updateSensorReadings, interval * 1000);
+            updateIntervalId = setInterval(updateSensorReadings, interval);
             document.getElementById("start-update").disabled = true;
             document.getElementById("stop-update").disabled = false;
         }
