@@ -3,13 +3,12 @@ pub mod package {
 
     use crate::{
         hardware_manager,
-        server::protocols::v1::structures::{Sensor, SensorReading, Value},
+        server::protocols::v1::structures::{Sensor, SensorReading, SensorType, Value},
     };
     pub enum Sensors {
         All,
         Temperature,
         Pressure,
-        Altitude,
         Accelerometer,
         Gyroscope,
         Magnetometer,
@@ -26,7 +25,6 @@ pub mod package {
                 "all" => Ok(Sensors::All),
                 "temperature" => Ok(Sensors::Temperature),
                 "pressure" => Ok(Sensors::Pressure),
-                "altitude" => Ok(Sensors::Altitude),
                 "accelerometer" => Ok(Sensors::Accelerometer),
                 "gyroscope" => Ok(Sensors::Gyroscope),
                 "magnetometer" => Ok(Sensors::Magnetometer),
@@ -89,7 +87,6 @@ pub mod package {
                 vec![
                     Sensors::Temperature,
                     Sensors::Pressure,
-                    Sensors::Altitude,
                     Sensors::Accelerometer,
                     Sensors::Gyroscope,
                     Sensors::Magnetometer,
@@ -101,41 +98,30 @@ pub mod package {
 
         for selection in selection_array {
             match selection {
-                Sensors::Temperature => package.readings.sensors.push(Sensor {
-                    sensor_type: "temperature".to_string(),
-                    unit: "C".to_string(),
-                    value: Value::Single(hardware_manager::read_temperature()),
-                }),
-                Sensors::Pressure => package.readings.sensors.push(Sensor {
-                    sensor_type: "pressure".to_string(),
-                    unit: "kPa".to_string(),
-                    value: Value::Single(hardware_manager::read_pŕessure()),
-                }),
-                Sensors::Altitude => package.readings.sensors.push(Sensor {
-                    sensor_type: "altitude".to_string(),
-                    unit: "m".to_string(),
-                    value: Value::Single(hardware_manager::read_altitude()),
-                }),
-                Sensors::Accelerometer => package.readings.sensors.push(Sensor {
-                    sensor_type: "accelerometer".to_string(),
-                    unit: "m/s2".to_string(),
-                    value: Value::Array(hardware_manager::read_accel().into()),
-                }),
-                Sensors::Gyroscope => package.readings.sensors.push(Sensor {
-                    sensor_type: "gyroscope".to_string(),
-                    unit: "rad/s".to_string(),
-                    value: Value::Array(hardware_manager::read_gyro().into()),
-                }),
-                Sensors::Magnetometer => package.readings.sensors.push(Sensor {
-                    sensor_type: "magnetometer".to_string(),
-                    unit: "uT".to_string(),
-                    value: Value::Array(hardware_manager::read_mag().into()),
-                }),
-                Sensors::Adc => package.readings.sensors.push(Sensor {
-                    sensor_type: "adc".to_string(),
-                    unit: "V".to_string(),
-                    value: Value::Array(hardware_manager::read_adc_all().into()),
-                }),
+                Sensors::Temperature => package.readings.sensors.push(Sensor::new(
+                    SensorType::Temperature,
+                    Value::Single(hardware_manager::read_temperature()),
+                )),
+                Sensors::Pressure => package.readings.sensors.push(Sensor::new(
+                    SensorType::Pressure,
+                    Value::Single(hardware_manager::read_pressure()),
+                )),
+                Sensors::Accelerometer => package.readings.sensors.push(Sensor::new(
+                    SensorType::Accelerometer,
+                    Value::Array(hardware_manager::read_accel().into()),
+                )),
+                Sensors::Gyroscope => package.readings.sensors.push(Sensor::new(
+                    SensorType::Gyroscope,
+                    Value::Array(hardware_manager::read_gyro().into()),
+                )),
+                Sensors::Magnetometer => package.readings.sensors.push(Sensor::new(
+                    SensorType::Magnetometer,
+                    Value::Array(hardware_manager::read_mag().into()),
+                )),
+                Sensors::Adc => package.readings.sensors.push(Sensor::new(
+                    SensorType::Adc,
+                    Value::Array(hardware_manager::read_adc_all().into()),
+                )),
                 Sensors::All => {}
             }
         }
