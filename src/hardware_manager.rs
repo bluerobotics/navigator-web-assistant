@@ -143,7 +143,7 @@ pub fn read_temperature() -> f32 {
     with_navigator!().read_temperature()
 }
 
-pub fn read_pŕessure() -> f32 {
+pub fn read_pressure() -> f32 {
     with_navigator!().read_pressure()
 }
 
