@@ -14,13 +14,45 @@ pub struct Readings {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub enum SensorType {
+    Temperature,
+    Pressure,
+    Altitude,
+    Accelerometer,
+    Gyroscope,
+    Magnetometer,
+    Adc,
+}
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Sensor {
-    pub sensor_type: String,
+    #[serde(rename = "type")]
+    pub sensor_type: SensorType,
     pub unit: String,
     pub value: Value,
 }
 
+impl Sensor {
+    pub fn new(sensor_type: SensorType, value: Value) -> Self {
+        let unit = match sensor_type {
+            SensorType::Temperature => "C".to_string(),
+            SensorType::Pressure => "kPa".to_string(),
+            SensorType::Altitude => "m".to_string(),
+            SensorType::Accelerometer => "m/s2".to_string(),
+            SensorType::Gyroscope => "rad/s".to_string(),
+            SensorType::Magnetometer => "uT".to_string(),
+            SensorType::Adc => "V".to_string(),
+        };
+
+        Self {
+            sensor_type,
+            unit,
+            value,
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(untagged)]
 pub enum Value {
     Single(f32),
     Array(Vec<f32>),
