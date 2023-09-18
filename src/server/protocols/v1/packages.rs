@@ -9,7 +9,6 @@ pub mod package {
         All,
         Temperature,
         Pressure,
-        Altitude,
         Accelerometer,
         Gyroscope,
         Magnetometer,
@@ -26,7 +25,6 @@ pub mod package {
                 "all" => Ok(Sensors::All),
                 "temperature" => Ok(Sensors::Temperature),
                 "pressure" => Ok(Sensors::Pressure),
-                "altitude" => Ok(Sensors::Altitude),
                 "accelerometer" => Ok(Sensors::Accelerometer),
                 "gyroscope" => Ok(Sensors::Gyroscope),
                 "magnetometer" => Ok(Sensors::Magnetometer),
@@ -89,7 +87,6 @@ pub mod package {
                 vec![
                     Sensors::Temperature,
                     Sensors::Pressure,
-                    Sensors::Altitude,
                     Sensors::Accelerometer,
                     Sensors::Gyroscope,
                     Sensors::Magnetometer,
@@ -108,10 +105,6 @@ pub mod package {
                 Sensors::Pressure => package.readings.sensors.push(Sensor::new(
                     SensorType::Pressure,
                     Value::Single(hardware_manager::read_pressure()),
-                )),
-                Sensors::Altitude => package.readings.sensors.push(Sensor::new(
-                    SensorType::Altitude,
-                    Value::Single(hardware_manager::read_altitude()),
                 )),
                 Sensors::Accelerometer => package.readings.sensors.push(Sensor::new(
                     SensorType::Accelerometer,
