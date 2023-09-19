@@ -55,6 +55,23 @@ impl NavigationManager {
         }
         &NAVIGATOR
     }
+
+    pub fn init_sensor_reading() {
+        NavigationManager::get_instance()
+            .lock()
+            .unwrap()
+            .as_mut()
+            .unwrap()
+            .sentinel = Some(thread::spawn(|| NavigationManager::sensor_reading(500)))
+    }
+
+    fn sensor_reading(refresh_interval: u64) {
+        loop {
+            let reading = with_navigator!().read_all();
+            *DATA.write().unwrap() = Data { state: reading };
+            thread::sleep(std::time::Duration::from_millis(refresh_interval));
+        }
+    }
 }
 
 // Help with conversion from navigator enum API to our stable API
