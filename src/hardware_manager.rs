@@ -1,24 +1,14 @@
 use lazy_static::lazy_static;
 use std::convert::From;
-use std::sync::Mutex;
-
+use std::sync::{Arc, Mutex, RwLock};
+use std::thread;
 struct NavigationManager {
     navigator: navigator_rs::Navigator,
+    sentinel: Option<std::thread::JoinHandle<()>>,
 }
-
-lazy_static! {
-    static ref NAVIGATOR: Mutex<Option<NavigationManager>> = Mutex::new(None);
-}
-
-impl NavigationManager {
-    fn get_instance() -> &'static Mutex<Option<Self>> {
-        if NAVIGATOR.lock().unwrap().is_none() {
-            *NAVIGATOR.lock().unwrap() = Some(NavigationManager {
-                navigator: navigator_rs::Navigator::new(),
-            });
-        }
-        &NAVIGATOR
-    }
+#[derive(Debug, Clone, Default, Copy)]
+struct Data {
+    state: navigator_rs::SensorData,
 }
 
 macro_rules! with_navigator {
@@ -44,6 +34,27 @@ macro_rules! impl_from_enum {
             }
         }
     };
+}
+
+lazy_static! {
+    static ref NAVIGATOR: Arc<Mutex<Option<NavigationManager>>> = Arc::new(Mutex::new(None));
+}
+
+lazy_static! {
+    static ref DATA: Arc<RwLock<Data>> = Default::default();
+}
+
+impl NavigationManager {
+    pub fn get_instance() -> &'static Mutex<Option<Self>> {
+        if NAVIGATOR.lock().unwrap().is_none() {
+            let navigator = navigator_rs::Navigator::new();
+            *NAVIGATOR.lock().unwrap() = Some(NavigationManager {
+                navigator,
+                sentinel: None,
+            });
+        }
+        &NAVIGATOR
+    }
 }
 
 // Help with conversion from navigator enum API to our stable API
@@ -127,32 +138,32 @@ pub fn init() {
     with_navigator!().init()
 }
 
+pub fn init_auto_reading() {
+    NavigationManager::init_sensor_reading();
+}
+
 pub fn read_accel() -> AxisData {
-    with_navigator!().read_accel().into()
+    DATA.read().unwrap().state.accelerometer.into()
 }
 
 pub fn read_gyro() -> AxisData {
-    with_navigator!().read_gyro().into()
+    DATA.read().unwrap().state.gyro.into()
 }
 
 pub fn read_mag() -> AxisData {
-    with_navigator!().read_mag().into()
+    DATA.read().unwrap().state.magnetometer.into()
 }
 
 pub fn read_temperature() -> f32 {
-    with_navigator!().read_temperature()
+    DATA.read().unwrap().state.temperature
 }
 
 pub fn read_pressure() -> f32 {
-    with_navigator!().read_pressure()
-}
-
-pub fn read_altitude() -> f32 {
-    with_navigator!().read_altitude()
+    DATA.read().unwrap().state.pressure
 }
 
 pub fn read_adc_all() -> ADCData {
-    with_navigator!().read_adc_all().into()
+    DATA.read().unwrap().state.adc.into()
 }
 
 pub fn set_pwm_channel_value(channel: PwmChannel, value: u16) {
