@@ -18,6 +18,9 @@ pub async fn run() -> std::io::Result<()> {
             .service(protocols::v1::rest::post_pwm_enable)
             .service(protocols::v1::rest::post_pwm_frequency)
             .service(protocols::v1::rest::post_pwm)
+            .service(protocols::v1::rest::post_neopixel)
+            .service(protocols::v1::rest::get_led)
+            .service(protocols::v1::rest::post_led)
     });
 
     server.bind(("0.0.0.0", 8080))?.run().await
