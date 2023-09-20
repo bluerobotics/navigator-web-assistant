@@ -78,6 +78,20 @@ pub mod package {
         "success".to_string()
     }
 
+    pub fn set_led(select: hardware_manager::UserLed, state: bool) -> String {
+        hardware_manager::set_led(select , state);
+        "success".to_string()
+    }
+
+    pub fn get_led(select: hardware_manager::UserLed) -> String {
+        hardware_manager::get_led(select).to_string()
+    }
+
+    pub fn set_neopixel(rgb_array: Vec<[u8; 3]>) -> String {
+        hardware_manager::set_neopixel(rgb_array);
+        "success".to_string()
+    }
+
     pub fn reading(selection: Sensors) -> SensorReading {
         let mut package: SensorReading = Default::default();
         package.readings.timestamp = chrono::Utc::now().to_string();
