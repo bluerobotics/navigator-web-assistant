@@ -128,6 +128,14 @@ pub enum PwmChannel {
     All,
 }
 
+pub enum UserLed {
+    Led1,
+    Led2,
+    Led3,
+}
+
+impl_from_enum!(UserLed, navigator_rs::UserLed, Led1, Led2, Led3);
+
 pub struct AxisData {
     x: f32,
     y: f32,
@@ -143,6 +151,14 @@ pub fn init() {
 
 pub fn init_auto_reading() {
     NavigationManager::init_sensor_reading();
+}
+
+pub fn set_led(select: UserLed, state: bool) {
+    with_navigator!().set_led(select.into(), state)
+}
+
+pub fn get_led(select: UserLed) -> bool {
+    with_navigator!().get_led(select.into())
 }
 
 pub fn read_accel() -> AxisData {
