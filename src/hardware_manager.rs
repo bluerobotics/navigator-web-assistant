@@ -161,6 +161,10 @@ pub fn get_led(select: UserLed) -> bool {
     with_navigator!().get_led(select.into())
 }
 
+pub fn set_neopixel(rgb_array: Vec<[u8; 3]>) {
+    with_navigator!().set_neopixel(&rgb_array)
+}
+
 pub fn read_accel() -> AxisData {
     DATA.read().unwrap().state.accelerometer.into()
 }
