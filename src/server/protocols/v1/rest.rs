@@ -1,7 +1,7 @@
 use crate::{hardware_manager, server::protocols::v1::packages::package};
 use actix_web::{get, post, web, HttpResponse, Responder};
 use mime_guess::from_path;
-use std::str::FromStr;
+use std::{str::FromStr, vec};
 
 #[derive(rust_embed::RustEmbed)]
 #[folder = "src/server/protocols/v1/frontend"]
@@ -34,6 +34,29 @@ async fn echo(req_body: String) -> impl Responder {
 #[get("v1/sensor/{sensor}")]
 async fn get_sensor(sensor: web::Path<String>) -> impl Responder {
     let package = package::reading(package::Sensors::from_str(&sensor.into_inner()).unwrap());
+    HttpResponse::Ok().json(package)
+}
+
+#[get("v1/actuator/userleds/{userled}")]
+async fn get_led(userled: web::Path<String>) -> impl Responder {
+    let package = package::get_led(hardware_manager::UserLed::from_str(&userled.into_inner()).unwrap());
+    HttpResponse::Ok().json(package)
+}
+
+#[post("v1/actuator/userleds/{userled}/{value}")]
+async fn post_led(path: web::Path<(String, bool)>) -> impl Responder {
+    let (userled, value) = path.into_inner();
+    let package = package::set_led(
+        hardware_manager::UserLed::from_str(userled.as_str()).unwrap(),
+        value,
+    );
+    HttpResponse::Ok().json(package)
+}
+
+#[post("v1/actuator/neopixel/{red}/{green}/{blue}")]
+async fn post_neopixel(path: web::Path<(u8,u8,u8)>) -> impl Responder {
+    let (red, green, blue) = path.into_inner();
+    let package = package::set_neopixel(vec!([red, green, blue]));
     HttpResponse::Ok().json(package)
 }
 
