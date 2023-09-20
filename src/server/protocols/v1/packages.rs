@@ -34,6 +34,21 @@ pub mod package {
         }
     }
 
+    impl FromStr for hardware_manager::UserLed {
+        type Err = Box<dyn Error>;
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            let s = s.to_lowercase();
+
+            match s.as_str() {
+                "led1" => Ok(hardware_manager::UserLed::Led1),
+                "led2" => Ok(hardware_manager::UserLed::Led2),
+                "led3" => Ok(hardware_manager::UserLed::Led3),
+                _ => Err(format!("{} is not a valid UserLed variant", s).into()),
+            }
+        }
+    }
+
     impl FromStr for hardware_manager::PwmChannel {
         type Err = Box<dyn Error>;
 
