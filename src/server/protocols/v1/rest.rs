@@ -1,7 +1,7 @@
-use crate::{hardware_manager, server::protocols::v1::packages::package};
+use crate::{hardware_manager, server::protocols::v1::packages};
 use actix_web::{get, post, web, HttpResponse, Responder};
 use mime_guess::from_path;
-use std::str::FromStr;
+use std::{str::FromStr, vec};
 
 #[derive(rust_embed::RustEmbed)]
 #[folder = "src/server/protocols/v1/frontend"]
@@ -31,16 +31,46 @@ async fn echo(req_body: String) -> impl Responder {
     HttpResponse::Ok().body(req_body)
 }
 
+#[get("v1/settings/init")]
+async fn init() -> impl Responder {
+    let package = packages::init();
+    HttpResponse::Ok().json(package)
+}
+
 #[get("v1/sensor/{sensor}")]
 async fn get_sensor(sensor: web::Path<String>) -> impl Responder {
-    let package = package::reading(package::Sensors::from_str(&sensor.into_inner()).unwrap());
+    let package = packages::reading(packages::Sensors::from_str(&sensor.into_inner()).unwrap());
+    HttpResponse::Ok().json(package)
+}
+
+#[get("v1/actuator/userled/{userled}")]
+async fn get_led(userled: web::Path<String>) -> impl Responder {
+    let package =
+        packages::get_led(hardware_manager::UserLed::from_str(&userled.into_inner()).unwrap());
+    HttpResponse::Ok().json(package)
+}
+
+#[post("v1/actuator/userled/{userled}/{value}")]
+async fn post_led(path: web::Path<(String, bool)>) -> impl Responder {
+    let (userled, value) = path.into_inner();
+    let package = packages::set_led(
+        hardware_manager::UserLed::from_str(userled.as_str()).unwrap(),
+        value,
+    );
+    HttpResponse::Ok().json(package)
+}
+
+#[post("v1/actuator/neopixel/{red}/{green}/{blue}")]
+async fn post_neopixel(path: web::Path<(u8, u8, u8)>) -> impl Responder {
+    let (red, green, blue) = path.into_inner();
+    let package = packages::set_neopixel(vec![[red, green, blue]]);
     HttpResponse::Ok().json(package)
 }
 
 #[post("v1/actuator/pwm/{channel}/{value}")]
 async fn post_pwm(path: web::Path<(String, u16)>) -> impl Responder {
     let (channel, value) = path.into_inner();
-    let package = package::pwm_channel_value(
+    let package = packages::pwm_channel_value(
         hardware_manager::PwmChannel::from_str(channel.as_str()).unwrap(),
         value,
     );
@@ -50,14 +80,14 @@ async fn post_pwm(path: web::Path<(String, u16)>) -> impl Responder {
 #[post("v1/actuator/pwm/enable/{bool}")]
 async fn post_pwm_enable(path: web::Path<bool>) -> impl Responder {
     let bool = path.into_inner();
-    let package = package::pwm_enable(bool);
+    let package = packages::pwm_enable(bool);
     HttpResponse::Ok().json(package)
 }
 
 #[post("v1/actuator/pwm/frequency/{frequency}")]
 async fn post_pwm_frequency(path: web::Path<f32>) -> impl Responder {
     let frequency = path.into_inner();
-    let package = package::set_pwm_freq_hz(frequency);
+    let package = packages::set_pwm_freq_hz(frequency);
     hardware_manager::pwm_enable(true);
     HttpResponse::Ok().json(package)
 }

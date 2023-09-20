@@ -1,14 +1,74 @@
+use derive_new::new;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SensorReading {
+use crate::hardware_manager;
+#[derive(new, Debug, Serialize, Deserialize)]
+pub struct AnsPackage {
+    #[new(value = r#""BlueOS_ID_0123".to_owned()"#)]
     pub id: String,
+    #[new(value = r#""Navigator_v4".to_owned()"#)]
     pub model: String,
-    pub readings: Readings,
+    #[serde(flatten)]
+    pub operation: Operation,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Readings {
+#[serde(untagged)]
+pub enum Operation {
+    Sensor(SensorReading),
+    Actuator(ActuatorRequest),
+    Settings,
+}
+#[derive(Debug, Serialize, Deserialize, new)]
+pub struct ActuatorRequest {
+    pub timestamp: String,
+    pub actuator: ActuatorDevices,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub enum ActuatorDevices {
+    Pwm(Pwm),
+    UserLED(UserLED),
+    NeoPixel(NeoPixel),
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Pwm {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub channel: Option<Vec<hardware_manager::PwmChannel>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<Vec<u16>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub frequency: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub enable: Option<bool>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserLED {
+    pub channel: Vec<hardware_manager::UserLed>,
+    pub value: Vec<bool>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NeoPixel {
+    pub value: Vec<NeoPixelRGB>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NeoPixelRGB {
+    pub red: u8,
+    pub green: u8,
+    pub blue: u8,
+}
+
+impl NeoPixelRGB {
+    pub fn from(colors: [u8; 3]) -> Self {
+        Self {
+            red: colors[0],
+            green: colors[1],
+            blue: colors[2],
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SensorReading {
     pub timestamp: String,
     pub sensors: Vec<Sensor>,
 }
@@ -61,12 +121,8 @@ pub enum Value {
 impl Default for SensorReading {
     fn default() -> Self {
         Self {
-            id: "Navigator from BlueOS_123456".to_string(),
-            model: "Navigator V4".to_string(),
-            readings: Readings {
-                timestamp: "".to_string(),
-                sensors: vec![],
-            },
+            timestamp: "".to_string(),
+            sensors: vec![],
         }
     }
 }
