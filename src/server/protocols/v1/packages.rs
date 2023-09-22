@@ -78,6 +78,85 @@ pub mod package {
         }
     }
 
+pub fn pwm_channel_value(channel: hardware_manager::PwmChannel, value: u16) -> AnsPackage {
+    hardware_manager::set_pwm_channel_value(channel.clone(), value);
+    let pwm = Pwm {
+        channel: Some(vec![channel]),
+        value: Some(vec![value]),
+        frequency: None,
+        enable: None,
+    };
+    let package = ActuatorRequest {
+        timestamp: chrono::Utc::now().to_string(),
+        actuator: ActuatorDevices::Pwm(pwm),
+    };
+    AnsPackage::new(Operation::Actuator(package))
+}
+
+pub fn pwm_enable(state: bool) -> AnsPackage {
+    hardware_manager::pwm_enable(state);
+    let pwm = Pwm {
+        channel: None,
+        value: None,
+        frequency: None,
+        enable: Some(state),
+    };
+    let package = ActuatorRequest {
+        timestamp: chrono::Utc::now().to_string(),
+        actuator: ActuatorDevices::Pwm(pwm),
+    };
+    AnsPackage::new(Operation::Actuator(package))
+}
+
+pub fn set_pwm_freq_hz(freq: f32) -> AnsPackage {
+    hardware_manager::set_pwm_freq_hz(freq);
+    let pwm = Pwm {
+        channel: None,
+        value: None,
+        frequency: Some(freq),
+        enable: None,
+    };
+    let package = ActuatorRequest {
+        timestamp: chrono::Utc::now().to_string(),
+        actuator: ActuatorDevices::Pwm(pwm),
+    };
+    AnsPackage::new(Operation::Actuator(package))
+}
+
+pub fn set_led(select: hardware_manager::UserLed, state: bool) -> AnsPackage {
+    hardware_manager::set_led(select.clone(), state);
+    let user_led = UserLED {
+        channel: (vec![select]),
+        value: (vec![state]),
+    };
+    AnsPackage::new(Operation::Actuator(ActuatorRequest {
+        timestamp: (chrono::Utc::now().to_string()),
+        actuator: (ActuatorDevices::UserLED(user_led)),
+    }))
+}
+
+pub fn get_led(select: hardware_manager::UserLed) -> AnsPackage {
+    let state = hardware_manager::get_led(select.clone());
+    let user_led = UserLED {
+        channel: (vec![select]),
+        value: (vec![state]),
+    };
+    AnsPackage::new(Operation::Actuator(ActuatorRequest {
+        timestamp: (chrono::Utc::now().to_string()),
+        actuator: (ActuatorDevices::UserLED(user_led)),
+    }))
+}
+
+pub fn set_neopixel(rgb_array: Vec<[u8; 3]>) -> AnsPackage {
+    hardware_manager::set_neopixel(rgb_array.clone());
+    let rgb = NeoPixelRGB::from(rgb_array[0]);
+    let neopixel = NeoPixel { value: vec![rgb] };
+    AnsPackage::new(Operation::Actuator(ActuatorRequest {
+        timestamp: (chrono::Utc::now().to_string()),
+        actuator: (ActuatorDevices::NeoPixel(neopixel)),
+    }))
+}
+
 pub fn reading(selection: Sensors) -> AnsPackage {
     let mut sensor_reading = SensorReading {
         timestamp: chrono::Utc::now().to_string(),
