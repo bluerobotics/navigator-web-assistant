@@ -1,4 +1,5 @@
 use lazy_static::lazy_static;
+use serde::{Deserialize, Serialize};
 use std::convert::From;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, RwLock};
@@ -108,7 +109,7 @@ impl From<navigator_rs::ADCData> for ADCData {
         }
     }
 }
-
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum PwmChannel {
     Ch1,
     Ch2,
@@ -128,7 +129,7 @@ pub enum PwmChannel {
     Ch16,
     All,
 }
-
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum UserLed {
     Led1,
     Led2,
