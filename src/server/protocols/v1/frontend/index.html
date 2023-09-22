@@ -202,7 +202,7 @@
                     const sensorTable = document.getElementById("sensor-table");
                     sensorTable.innerHTML = ""; // Clear previous readings
 
-                    data.readings.sensors.forEach((sensor) => {
+                    data.sensors.forEach((sensor) => {
                         const row = sensorTable.insertRow();
                         const sensorTypeCell = row.insertCell(0);
                         const valueCell = row.insertCell(1);
