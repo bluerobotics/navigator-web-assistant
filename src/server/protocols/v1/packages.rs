@@ -78,83 +78,55 @@ pub mod package {
         }
     }
 
-    pub fn pwm_channel_value(channel: hardware_manager::PwmChannel, value: u16) -> String {
-        hardware_manager::set_pwm_channel_value(channel, value);
-        "success".to_string()
-    }
+pub fn reading(selection: Sensors) -> AnsPackage {
+    let mut sensor_reading = SensorReading {
+        timestamp: chrono::Utc::now().to_string(),
+        ..Default::default()
+    };
 
-    pub fn pwm_enable(state: bool) -> String {
-        hardware_manager::pwm_enable(state);
-        "success".to_string()
-    }
-
-    pub fn set_pwm_freq_hz(freq: f32) -> String {
-        hardware_manager::set_pwm_freq_hz(freq);
-        "success".to_string()
-    }
-
-    pub fn set_led(select: hardware_manager::UserLed, state: bool) -> String {
-        hardware_manager::set_led(select , state);
-        "success".to_string()
-    }
-
-    pub fn get_led(select: hardware_manager::UserLed) -> String {
-        hardware_manager::get_led(select).to_string()
-    }
-
-    pub fn set_neopixel(rgb_array: Vec<[u8; 3]>) -> String {
-        hardware_manager::set_neopixel(rgb_array);
-        "success".to_string()
-    }
-
-    pub fn reading(selection: Sensors) -> SensorReading {
-        let mut package: SensorReading = Default::default();
-        package.readings.timestamp = chrono::Utc::now().to_string();
-
-        let selection_array: Vec<Sensors> = match selection {
-            Sensors::All => {
-                vec![
-                    Sensors::Temperature,
-                    Sensors::Pressure,
-                    Sensors::Accelerometer,
-                    Sensors::Gyroscope,
-                    Sensors::Magnetometer,
-                    Sensors::Adc,
-                ]
-            }
-            _ => vec![selection],
-        };
-
-        for selection in selection_array {
-            match selection {
-                Sensors::Temperature => package.readings.sensors.push(Sensor::new(
-                    SensorType::Temperature,
-                    Value::Single(hardware_manager::read_temperature()),
-                )),
-                Sensors::Pressure => package.readings.sensors.push(Sensor::new(
-                    SensorType::Pressure,
-                    Value::Single(hardware_manager::read_pressure()),
-                )),
-                Sensors::Accelerometer => package.readings.sensors.push(Sensor::new(
-                    SensorType::Accelerometer,
-                    Value::Array(hardware_manager::read_accel().into()),
-                )),
-                Sensors::Gyroscope => package.readings.sensors.push(Sensor::new(
-                    SensorType::Gyroscope,
-                    Value::Array(hardware_manager::read_gyro().into()),
-                )),
-                Sensors::Magnetometer => package.readings.sensors.push(Sensor::new(
-                    SensorType::Magnetometer,
-                    Value::Array(hardware_manager::read_mag().into()),
-                )),
-                Sensors::Adc => package.readings.sensors.push(Sensor::new(
-                    SensorType::Adc,
-                    Value::Array(hardware_manager::read_adc_all().into()),
-                )),
-                Sensors::All => {}
-            }
+    let selection_array: Vec<Sensors> = match selection {
+        Sensors::All => {
+            vec![
+                Sensors::Temperature,
+                Sensors::Pressure,
+                Sensors::Accelerometer,
+                Sensors::Gyroscope,
+                Sensors::Magnetometer,
+                Sensors::Adc,
+            ]
         }
+        _ => vec![selection],
+    };
 
-        package
+    for selection in selection_array {
+        match selection {
+            Sensors::Temperature => sensor_reading.sensors.push(Sensor::new(
+                SensorType::Temperature,
+                Value::Single(hardware_manager::read_temperature()),
+            )),
+            Sensors::Pressure => sensor_reading.sensors.push(Sensor::new(
+                SensorType::Pressure,
+                Value::Single(hardware_manager::read_pressure()),
+            )),
+            Sensors::Accelerometer => sensor_reading.sensors.push(Sensor::new(
+                SensorType::Accelerometer,
+                Value::Array(hardware_manager::read_accel().into()),
+            )),
+            Sensors::Gyroscope => sensor_reading.sensors.push(Sensor::new(
+                SensorType::Gyroscope,
+                Value::Array(hardware_manager::read_gyro().into()),
+            )),
+            Sensors::Magnetometer => sensor_reading.sensors.push(Sensor::new(
+                SensorType::Magnetometer,
+                Value::Array(hardware_manager::read_mag().into()),
+            )),
+            Sensors::Adc => sensor_reading.sensors.push(Sensor::new(
+                SensorType::Adc,
+                Value::Array(hardware_manager::read_adc_all().into()),
+            )),
+            Sensors::All => {}
+        }
     }
+
+    AnsPackage::new(Operation::Sensor(sensor_reading))
 }
