@@ -24,6 +24,47 @@ pub struct ActuatorRequest {
     pub timestamp: String,
     pub actuator: ActuatorDevices,
 }
+#[derive(Debug, Serialize, Deserialize)]
+pub enum ActuatorDevices {
+    Pwm(Pwm),
+    UserLED(UserLED),
+    NeoPixel(NeoPixel),
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Pwm {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub channel: Option<Vec<hardware_manager::PwmChannel>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<Vec<u16>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub frequency: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub enable: Option<bool>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserLED {
+    pub channel: Vec<hardware_manager::UserLed>,
+    pub value: Vec<bool>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NeoPixel {
+    pub value: Vec<NeoPixelRGB>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NeoPixelRGB {
+    pub red: u8,
+    pub green: u8,
+    pub blue: u8,
+}
+
+impl NeoPixelRGB {
+    pub fn from(colors: [u8; 3]) -> Self {
+        Self {
+            red: colors[0],
+            green: colors[1],
+            blue: colors[2],
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
