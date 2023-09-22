@@ -1,14 +1,33 @@
+use derive_new::new;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SensorReading {
+use crate::hardware_manager;
+#[derive(new, Debug, Serialize, Deserialize)]
+pub struct AnsPackage {
+    #[new(value = r#""BlueOS_ID_0123".to_owned()"#)]
     pub id: String,
+    #[new(value = r#""Navigator_v4".to_owned()"#)]
     pub model: String,
-    pub readings: Readings,
+    #[serde(flatten)]
+    pub operation: Operation,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Readings {
+#[serde(untagged)]
+pub enum Operation {
+    Sensor(SensorReading),
+    Actuator(ActuatorRequest),
+    Settings,
+}
+#[derive(Debug, Serialize, Deserialize, new)]
+pub struct ActuatorRequest {
+    pub timestamp: String,
+    pub actuator: ActuatorDevices,
+}
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SensorReading {
     pub timestamp: String,
     pub sensors: Vec<Sensor>,
 }
@@ -61,12 +80,8 @@ pub enum Value {
 impl Default for SensorReading {
     fn default() -> Self {
         Self {
-            id: "Navigator from BlueOS_123456".to_string(),
-            model: "Navigator V4".to_string(),
-            readings: Readings {
-                timestamp: "".to_string(),
-                sensors: vec![],
-            },
+            timestamp: "".to_string(),
+            sensors: vec![],
         }
     }
 }
