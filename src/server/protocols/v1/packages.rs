@@ -78,6 +78,11 @@ pub mod package {
         }
     }
 
+pub fn init() -> AnsPackage {
+    hardware_manager::init();
+    AnsPackage::new(Operation::Settings)
+}
+
 pub fn pwm_channel_value(channel: hardware_manager::PwmChannel, value: u16) -> AnsPackage {
     hardware_manager::set_pwm_channel_value(channel.clone(), value);
     let pwm = Pwm {
