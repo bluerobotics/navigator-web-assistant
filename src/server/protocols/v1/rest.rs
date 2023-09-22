@@ -50,7 +50,7 @@ async fn get_led(userled: web::Path<String>) -> impl Responder {
     HttpResponse::Ok().json(package)
 }
 
-#[post("v1/actuator/userleds/{userled}/{value}")]
+#[post("v1/actuator/userled/{userled}/{value}")]
 async fn post_led(path: web::Path<(String, bool)>) -> impl Responder {
     let (userled, value) = path.into_inner();
     let package = packages::set_led(
