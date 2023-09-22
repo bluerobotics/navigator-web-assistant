@@ -31,9 +31,15 @@ async fn echo(req_body: String) -> impl Responder {
     HttpResponse::Ok().body(req_body)
 }
 
+#[get("v1/settings/init")]
+async fn init() -> impl Responder {
+    let package = packages::init();
+    HttpResponse::Ok().json(package)
+}
+
 #[get("v1/sensor/{sensor}")]
 async fn get_sensor(sensor: web::Path<String>) -> impl Responder {
-    let package = package::reading(package::Sensors::from_str(&sensor.into_inner()).unwrap());
+    let package = packages::reading(packages::Sensors::from_str(&sensor.into_inner()).unwrap());
     HttpResponse::Ok().json(package)
 }
 
