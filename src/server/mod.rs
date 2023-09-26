@@ -21,6 +21,7 @@ pub async fn run() -> std::io::Result<()> {
             .service(protocols::v1::rest::post_neopixel)
             .service(protocols::v1::rest::get_led)
             .service(protocols::v1::rest::post_led)
+            .service(protocols::v1::rest::get_server_metadata)
     });
 
     server.bind(("0.0.0.0", 8080))?.run().await
