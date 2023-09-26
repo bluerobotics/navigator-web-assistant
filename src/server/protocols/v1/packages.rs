@@ -1,7 +1,8 @@
 use crate::{
     hardware_manager::{self},
     server::protocols::v1::structures::{
-        AnsPackage, Operation, Sensor, SensorReading, SensorType, Value,ActuatorDevices, ActuatorRequest, NeoPixel, NeoPixelRGB, Pwm, UserLED
+        AnsPackage, InputDeviceType, InputDevices, InputRequest, NeoPixel, NeoPixelRGB, Operation,
+        OutputDevices, OutputRequest, Pwm, UserLED, Value,
     },
 };
 use std::{error::Error, str::FromStr};
@@ -92,11 +93,11 @@ pub fn pwm_channel_value(channel: hardware_manager::PwmChannel, value: u16) -> A
         frequency: None,
         enable: None,
     };
-    let package = ActuatorRequest {
+    let package = OutputRequest {
         timestamp: chrono::Utc::now().to_string(),
-        actuator: ActuatorDevices::Pwm(pwm),
+        output: vec![OutputDevices::Pwm(pwm)],
     };
-    AnsPackage::new(Operation::Actuator(package))
+    AnsPackage::new(Operation::Output(package))
 }
 
 pub fn pwm_enable(state: bool) -> AnsPackage {
@@ -107,11 +108,11 @@ pub fn pwm_enable(state: bool) -> AnsPackage {
         frequency: None,
         enable: Some(state),
     };
-    let package = ActuatorRequest {
+    let package = OutputRequest {
         timestamp: chrono::Utc::now().to_string(),
-        actuator: ActuatorDevices::Pwm(pwm),
+        output: vec![OutputDevices::Pwm(pwm)],
     };
-    AnsPackage::new(Operation::Actuator(package))
+    AnsPackage::new(Operation::Output(package))
 }
 
 pub fn set_pwm_freq_hz(freq: f32) -> AnsPackage {
@@ -122,11 +123,11 @@ pub fn set_pwm_freq_hz(freq: f32) -> AnsPackage {
         frequency: Some(freq),
         enable: None,
     };
-    let package = ActuatorRequest {
+    let package = OutputRequest {
         timestamp: chrono::Utc::now().to_string(),
-        actuator: ActuatorDevices::Pwm(pwm),
+        output: vec![OutputDevices::Pwm(pwm)],
     };
-    AnsPackage::new(Operation::Actuator(package))
+    AnsPackage::new(Operation::Output(package))
 }
 
 pub fn set_led(select: hardware_manager::UserLed, state: bool) -> AnsPackage {
@@ -135,9 +136,9 @@ pub fn set_led(select: hardware_manager::UserLed, state: bool) -> AnsPackage {
         channel: (vec![select]),
         value: (vec![state]),
     };
-    AnsPackage::new(Operation::Actuator(ActuatorRequest {
-        timestamp: (chrono::Utc::now().to_string()),
-        actuator: (ActuatorDevices::UserLED(user_led)),
+    AnsPackage::new(Operation::Output(OutputRequest {
+        timestamp: chrono::Utc::now().to_string(),
+        output: vec![OutputDevices::UserLED(user_led)],
     }))
 }
 
@@ -147,9 +148,9 @@ pub fn get_led(select: hardware_manager::UserLed) -> AnsPackage {
         channel: (vec![select]),
         value: (vec![state]),
     };
-    AnsPackage::new(Operation::Actuator(ActuatorRequest {
+    AnsPackage::new(Operation::Output(OutputRequest {
         timestamp: (chrono::Utc::now().to_string()),
-        actuator: (ActuatorDevices::UserLED(user_led)),
+        output: vec![OutputDevices::UserLED(user_led)],
     }))
 }
 
@@ -157,14 +158,14 @@ pub fn set_neopixel(rgb_array: Vec<[u8; 3]>) -> AnsPackage {
     hardware_manager::set_neopixel(rgb_array.clone());
     let rgb = NeoPixelRGB::from(rgb_array[0]);
     let neopixel = NeoPixel { value: vec![rgb] };
-    AnsPackage::new(Operation::Actuator(ActuatorRequest {
+    AnsPackage::new(Operation::Output(OutputRequest {
         timestamp: (chrono::Utc::now().to_string()),
-        actuator: (ActuatorDevices::NeoPixel(neopixel)),
+        output: vec![OutputDevices::NeoPixel(neopixel)],
     }))
 }
 
 pub fn reading(selection: Sensors) -> AnsPackage {
-    let mut sensor_reading = SensorReading {
+    let mut sensor_reading = InputRequest {
         timestamp: chrono::Utc::now().to_string(),
         ..Default::default()
     };
@@ -185,33 +186,33 @@ pub fn reading(selection: Sensors) -> AnsPackage {
 
     for selection in selection_array {
         match selection {
-            Sensors::Temperature => sensor_reading.sensors.push(Sensor::new(
-                SensorType::Temperature,
+            Sensors::Temperature => sensor_reading.input.push(InputDevices::new(
+                InputDeviceType::Temperature,
                 Value::Single(hardware_manager::read_temperature()),
             )),
-            Sensors::Pressure => sensor_reading.sensors.push(Sensor::new(
-                SensorType::Pressure,
+            Sensors::Pressure => sensor_reading.input.push(InputDevices::new(
+                InputDeviceType::Pressure,
                 Value::Single(hardware_manager::read_pressure()),
             )),
-            Sensors::Accelerometer => sensor_reading.sensors.push(Sensor::new(
-                SensorType::Accelerometer,
+            Sensors::Accelerometer => sensor_reading.input.push(InputDevices::new(
+                InputDeviceType::Accelerometer,
                 Value::Array(hardware_manager::read_accel().into()),
             )),
-            Sensors::Gyroscope => sensor_reading.sensors.push(Sensor::new(
-                SensorType::Gyroscope,
+            Sensors::Gyroscope => sensor_reading.input.push(InputDevices::new(
+                InputDeviceType::Gyroscope,
                 Value::Array(hardware_manager::read_gyro().into()),
             )),
-            Sensors::Magnetometer => sensor_reading.sensors.push(Sensor::new(
-                SensorType::Magnetometer,
+            Sensors::Magnetometer => sensor_reading.input.push(InputDevices::new(
+                InputDeviceType::Magnetometer,
                 Value::Array(hardware_manager::read_mag().into()),
             )),
-            Sensors::Adc => sensor_reading.sensors.push(Sensor::new(
-                SensorType::Adc,
+            Sensors::Adc => sensor_reading.input.push(InputDevices::new(
+                InputDeviceType::Adc,
                 Value::Array(hardware_manager::read_adc_all().into()),
             )),
             Sensors::All => {}
         }
     }
 
-    AnsPackage::new(Operation::Sensor(sensor_reading))
+    AnsPackage::new(Operation::Input(sensor_reading))
 }
