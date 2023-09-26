@@ -126,3 +126,30 @@ impl Default for InputRequest {
         }
     }
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ServerMetadata {
+    pub name: &'static str,
+    pub description: &'static str,
+    pub icon: &'static str,
+    pub company: &'static str,
+    pub version: &'static str,
+    pub new_page: bool,
+    pub webpage: &'static str,
+    pub api: &'static str,
+}
+
+impl Default for ServerMetadata {
+    fn default() -> Self {
+        Self {
+            name: "Navigator Assistant",
+            description: "A navigator extension to expose navigator to web.",
+            icon: "mdi-compass-outline",
+            company: "BlueRobotics",
+            version: "0.0.1",
+            new_page: false,
+            webpage: "https://github.com/RaulTrombin/navigator-assistant",
+            api: "https://raultrombin.github.io/navigator-assistant/api",
+        }
+    }
+}
