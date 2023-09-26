@@ -1,4 +1,7 @@
-use crate::{hardware_manager, server::protocols::v1::packages};
+use crate::{
+    hardware_manager,
+    server::protocols::v1::{packages, structures::ServerMetadata},
+};
 use actix_web::{get, post, web, HttpResponse, Responder};
 use mime_guess::from_path;
 use std::{str::FromStr, vec};
@@ -89,5 +92,12 @@ async fn post_pwm_frequency(path: web::Path<f32>) -> impl Responder {
     let frequency = path.into_inner();
     let package = packages::set_pwm_freq_hz(frequency);
     hardware_manager::pwm_enable(true);
+    HttpResponse::Ok().json(package)
+}
+
+/// The "register_service" route is used by BlueOS extensions manager
+#[get("register_service")]
+async fn get_server_metadata() -> impl Responder {
+    let package = ServerMetadata::default();
     HttpResponse::Ok().json(package)
 }
