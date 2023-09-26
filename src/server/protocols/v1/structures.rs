@@ -15,17 +15,17 @@ pub struct AnsPackage {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum Operation {
-    Sensor(SensorReading),
-    Actuator(ActuatorRequest),
+    Input(InputRequest),
+    Output(OutputRequest),
     Settings,
 }
 #[derive(Debug, Serialize, Deserialize, new)]
-pub struct ActuatorRequest {
+pub struct OutputRequest {
     pub timestamp: String,
-    pub actuator: ActuatorDevices,
+    pub output: Vec<OutputDevices>,
 }
 #[derive(Debug, Serialize, Deserialize)]
-pub enum ActuatorDevices {
+pub enum OutputDevices {
     Pwm(Pwm),
     UserLED(UserLED),
     NeoPixel(NeoPixel),
@@ -68,13 +68,13 @@ impl NeoPixelRGB {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct SensorReading {
+pub struct InputRequest {
     pub timestamp: String,
-    pub sensors: Vec<Sensor>,
+    pub input: Vec<InputDevices>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum SensorType {
+pub enum InputDeviceType {
     Temperature,
     Pressure,
     Altitude,
@@ -84,27 +84,27 @@ pub enum SensorType {
     Adc,
 }
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Sensor {
+pub struct InputDevices {
     #[serde(rename = "type")]
-    pub sensor_type: SensorType,
+    pub input_type: InputDeviceType,
     pub unit: String,
     pub value: Value,
 }
 
-impl Sensor {
-    pub fn new(sensor_type: SensorType, value: Value) -> Self {
-        let unit = match sensor_type {
-            SensorType::Temperature => "C".to_string(),
-            SensorType::Pressure => "kPa".to_string(),
-            SensorType::Altitude => "m".to_string(),
-            SensorType::Accelerometer => "m/s2".to_string(),
-            SensorType::Gyroscope => "rad/s".to_string(),
-            SensorType::Magnetometer => "uT".to_string(),
-            SensorType::Adc => "V".to_string(),
+impl InputDevices {
+    pub fn new(input_type: InputDeviceType, value: Value) -> Self {
+        let unit = match input_type {
+            InputDeviceType::Temperature => "C".to_string(),
+            InputDeviceType::Pressure => "kPa".to_string(),
+            InputDeviceType::Altitude => "m".to_string(),
+            InputDeviceType::Accelerometer => "m/s2".to_string(),
+            InputDeviceType::Gyroscope => "rad/s".to_string(),
+            InputDeviceType::Magnetometer => "uT".to_string(),
+            InputDeviceType::Adc => "V".to_string(),
         };
 
         Self {
-            sensor_type,
+            input_type,
             unit,
             value,
         }
@@ -118,11 +118,11 @@ pub enum Value {
     Array(Vec<f32>),
 }
 
-impl Default for SensorReading {
+impl Default for InputRequest {
     fn default() -> Self {
         Self {
             timestamp: "".to_string(),
-            sensors: vec![],
+            input: vec![],
         }
     }
 }
