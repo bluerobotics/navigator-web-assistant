@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>PWM Control</title>
+    <title>Navigator Assistant</title>
     <style>
         body {
             margin: 0;
@@ -119,7 +119,7 @@
             const channel = slider.name;
             const dutyCycle = slider.value;
 
-            fetch(`${baseUrl}/v1/actuator/pwm/${channel}/${dutyCycle}`, {
+            fetch(`${baseUrl}/v1/output/pwm/${channel}/${dutyCycle}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -144,7 +144,7 @@
                 "frequency-value"
             ).textContent = `${frequencyValue} Hz`;
 
-            fetch(`${baseUrl}/v1/actuator/pwm/frequency/${frequencyValue}`, {
+            fetch(`${baseUrl}/v1/output/pwm/frequency/${frequencyValue}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -168,7 +168,7 @@
             pwmEnabled = !pwmEnabled;
             const enableValue = pwmEnabled ? "true" : "false";
 
-            fetch(`${baseUrl}/v1/actuator/pwm/enable/${enableValue}`, {
+            fetch(`${baseUrl}/v1/output/pwm/enable/${enableValue}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -191,7 +191,7 @@
         }
 
         function updateSensorReadings() {
-            fetch(`${baseUrl}/v1/sensor/all`, {
+            fetch(`${baseUrl}/v1/input/all`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -202,20 +202,20 @@
                     const sensorTable = document.getElementById("sensor-table");
                     sensorTable.innerHTML = ""; // Clear previous readings
 
-                    data.sensors.forEach((sensor) => {
+                    data.input.forEach((input) => {
                         const row = sensorTable.insertRow();
                         const sensorTypeCell = row.insertCell(0);
                         const valueCell = row.insertCell(1);
                         const unitCell = row.insertCell(2);
 
-                        sensorTypeCell.textContent = sensor.type;
-                        unitCell.textContent = sensor.unit;
-                        if (Array.isArray(sensor.value)) {
-                            const roundedValues = sensor.value.map(val => val.toFixed(2));
+                        sensorTypeCell.textContent = input.type;
+                        unitCell.textContent = input.unit;
+                        if (Array.isArray(input.value)) {
+                            const roundedValues = input.value.map(val => val.toFixed(2));
                             valueCell.textContent = roundedValues.join(", ");
 
                         } else {
-                            valueCell.textContent = sensor.value.toFixed(2);
+                            valueCell.textContent = input.value.toFixed(2);
                         }
 
                     });
