@@ -4,15 +4,20 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+actix = "0.13.1"
 actix-web = "4.4.0"
+actix-web-actors = "4.2.0"
+actix-ws = "0.2.5"
 chrono = { version = "0.4.28", features = ["serde"] }
 derive-new = "0.5.9"
 env_logger = "0.10.0"
 futures = "0.3.28"
+futures-util = "0.3.28"
 lazy_static = "1.4.0"
 log = "0.4.20"
 mime_guess = "2.0.4"
 navigator-rs = "0.2.1"
+regex = "1.9.5"
 rust-embed = "8.0.0"
 serde = { version = "1.0.188", features = ["derive"] }
 serde_json = "1.0.105"
