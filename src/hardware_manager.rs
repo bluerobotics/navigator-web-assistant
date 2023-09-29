@@ -1,5 +1,7 @@
+use crate::server::protocols::v1::{packages, websocket};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::convert::From;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, RwLock};
@@ -57,8 +59,18 @@ impl NavigationManager {
         loop {
             let reading = with_navigator!().read_all();
             *DATA.write().unwrap() = Data { state: reading };
+
+            // Todo, websockeat inputs broadcast enable, and if sync/not(different interval)
+            NavigationManager::websocket_broadcast();
+
             thread::sleep(std::time::Duration::from_millis(refresh_interval));
         }
+    }
+
+    fn websocket_broadcast() {
+        let package: crate::server::protocols::v1::structures::AnsPackage =
+            packages::reading(packages::Sensors::All);
+        websocket::send_to_websockets(json!(package));
     }
 }
 
