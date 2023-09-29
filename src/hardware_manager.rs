@@ -7,7 +7,7 @@ use std::thread;
 #[derive(Default)]
 struct NavigationManager {
     navigator: navigator_rs::Navigator,
-    sentinel: Option<std::thread::JoinHandle<()>>,
+    monitor: Option<std::thread::JoinHandle<()>>,
 }
 #[derive(Debug, Clone, Default, Copy)]
 struct Data {
@@ -47,12 +47,12 @@ impl NavigationManager {
         &NAVIGATOR
     }
 
-    pub fn init_sensor_reading() {
-        NavigationManager::get_instance().lock().unwrap().sentinel =
-            Some(thread::spawn(|| NavigationManager::sensor_reading(500)))
+    pub fn init_monitor() {
+        NavigationManager::get_instance().lock().unwrap().monitor =
+            Some(thread::spawn(|| NavigationManager::monitor(500)))
     }
 
-    fn sensor_reading(refresh_interval: u64) {
+    fn monitor(refresh_interval: u64) {
         loop {
             let reading = with_navigator!().read_all();
             *DATA.write().unwrap() = Data { state: reading };
@@ -151,7 +151,7 @@ pub fn init() {
 }
 
 pub fn init_auto_reading() {
-    NavigationManager::init_sensor_reading();
+    NavigationManager::init_monitor();
 }
 
 pub fn set_led(select: UserLed, state: bool) {
