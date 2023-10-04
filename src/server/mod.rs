@@ -1,4 +1,5 @@
-use actix_web::{middleware, web, App, HttpServer};
+use actix_web::{middleware, App, HttpServer};
+use paperclip::actix::OpenApiExt;
 pub mod protocols;
 
 #[derive(rust_embed::RustEmbed)]
@@ -11,6 +12,8 @@ pub async fn run() -> std::io::Result<()> {
     let server = HttpServer::new(|| {
         App::new()
             .wrap(middleware::Logger::default())
+            .wrap_api()
+            .with_json_spec_at("/api/spec/v2")
             .service(protocols::v1::rest::index)
             .service(protocols::v1::rest::dist)
             .service(protocols::v1::rest::echo)
@@ -22,7 +25,8 @@ pub async fn run() -> std::io::Result<()> {
             .service(protocols::v1::rest::get_led)
             .service(protocols::v1::rest::post_led)
             .service(protocols::v1::rest::get_server_metadata)
-            .service(web::resource("/ws").route(web::get().to(protocols::v1::websocket::websocket)))
+            .service(protocols::v1::websocket::websocket)
+            .build()
     });
 
     server.bind(("0.0.0.0", 8080))?.run().await
