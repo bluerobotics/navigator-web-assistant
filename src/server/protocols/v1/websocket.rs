@@ -235,6 +235,7 @@ fn request_endpoint(request: &str) -> String {
                     }
                 }
             },
+            "get_connected" => json!(MANAGER.lock().unwrap().get_client_count()).to_string(),
             _ => json!("Error: Invalid command selected").to_string(),
         },
         _ => format!("{} {}", json!("Error: Invalid command:"), request),
