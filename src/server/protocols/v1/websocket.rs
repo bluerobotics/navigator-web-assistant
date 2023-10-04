@@ -1,18 +1,22 @@
+use crate::{
+    hardware_manager,
+    server::protocols::v1::{packages, structures::AnsPackage},
+};
 use actix::{Actor, Addr, AsyncContext, Handler, Message, StreamHandler};
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::HttpRequest;
 use actix_web_actors::ws;
 use lazy_static::lazy_static;
+use paperclip::actix::{
+    api_v2_operation, get,
+    web::{self, HttpResponse},
+    Apiv2Schema,
+};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{
     str::FromStr,
     sync::{Arc, Mutex},
-};
-
-use crate::{
-    hardware_manager,
-    server::protocols::v1::{packages, structures::AnsPackage},
 };
 
 pub struct StringMessage(String);
@@ -140,6 +144,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebsocketActor {
     }
 }
 
+#[api_v2_operation]
+#[get("/ws")]
 pub async fn websocket(
     req: HttpRequest,
     query: web::Query<WebsocketQuery>,
@@ -155,7 +161,7 @@ pub async fn websocket(
     ws::start(WebsocketActor::new(filter), &req, stream)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Apiv2Schema)]
 pub struct WebsocketQuery {
     /// Regex filter to select the desired incoming messages
     filter: Option<String>,
