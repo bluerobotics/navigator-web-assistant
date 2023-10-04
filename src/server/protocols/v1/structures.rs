@@ -1,8 +1,9 @@
 use derive_new::new;
+use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
 use crate::hardware_manager;
-#[derive(new, Debug, Serialize, Deserialize)]
+#[derive(new, Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct AnsPackage {
     #[new(value = r#""BlueOS_ID_0123".to_owned()"#)]
     pub id: String,
@@ -12,7 +13,7 @@ pub struct AnsPackage {
     pub operation: Operation,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 #[serde(untagged)]
 pub enum Operation {
     Input(InputRequest),
@@ -127,7 +128,7 @@ impl Default for InputRequest {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct ServerMetadata {
     pub name: &'static str,
     pub description: &'static str,
@@ -149,7 +150,7 @@ impl Default for ServerMetadata {
             version: "0.0.1",
             new_page: false,
             webpage: "https://github.com/RaulTrombin/navigator-assistant",
-            api: "https://raultrombin.github.io/navigator-assistant/api",
+            api: "/docs",
         }
     }
 }
