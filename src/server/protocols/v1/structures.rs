@@ -149,7 +149,7 @@ impl Default for ServerMetadata {
             version: "0.0.1",
             new_page: false,
             webpage: "https://github.com/RaulTrombin/navigator-assistant",
-            api: "https://raultrombin.github.io/navigator-assistant/api",
+            api: "/docs",
         }
     }
 }
