@@ -14,7 +14,7 @@ pub async fn run() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .wrap_api()
             .with_json_spec_at("/api/spec")
-            .with_swagger_ui_at("/swagger")
+            .with_swagger_ui_at("/docs")
             .service(protocols::v1::rest::index)
             .service(protocols::v1::rest::dist)
             .service(protocols::v1::rest::echo)
