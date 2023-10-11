@@ -110,3 +110,17 @@ async fn get_server_metadata() -> Result<Json<ServerMetadata>, Error> {
     let package = ServerMetadata::default();
     Ok(Json(package))
 }
+
+pub fn register_services(cfg: &mut web::ServiceConfig) {
+    cfg.service(index)
+        .service(dist)
+        .service(echo)
+        .service(get_sensor)
+        .service(get_led)
+        .service(get_server_metadata)
+        .service(post_pwm_enable)
+        .service(post_pwm_frequency)
+        .service(post_pwm)
+        .service(post_neopixel)
+        .service(post_led);
+}
