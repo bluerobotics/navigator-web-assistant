@@ -1,3 +1,4 @@
+use crate::data_logger::DataLogger;
 use crate::server::protocols::v1::packages;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
@@ -53,6 +54,12 @@ impl NavigationManager {
             Some(thread::spawn(|| NavigationManager::monitor(500)))
     }
 
+    pub fn init_datalogger(refresh_interval: u64, directory: String, filename: String) {
+        NavigationManager::get_instance().lock().unwrap().monitor = Some(thread::spawn(move || {
+            NavigationManager::data_logger(refresh_interval, directory, filename)
+        }))
+    }
+
     fn monitor(refresh_interval: u64) {
         loop {
             let reading = with_navigator!().read_all();
@@ -60,6 +67,22 @@ impl NavigationManager {
 
             // Todo, websockeat inputs broadcast enable, and if sync/not(different interval)
             NavigationManager::websocket_broadcast();
+
+            thread::sleep(std::time::Duration::from_millis(refresh_interval));
+        }
+    }
+
+    fn data_logger(refresh_interval: u64, directory: String, filename: String) {
+        let file_path = format!("{}/{}", directory, filename);
+        let mut logger = DataLogger::new(&file_path).expect("Failed to create/open CSV file");
+
+        // Just let monitor run before
+        thread::sleep(std::time::Duration::from_millis(500));
+
+        loop {
+            let reading = DATA.read().unwrap().state;
+
+            logger.log_data(&reading).expect("Failed to log data");
 
             thread::sleep(std::time::Duration::from_millis(refresh_interval));
         }
@@ -161,8 +184,9 @@ pub fn init() {
     with_navigator!().init()
 }
 
-pub fn init_auto_reading() {
-    NavigationManager::init_monitor();
+
+pub fn init_datalogger(refresh_interval: u64, directory: String, filename: String) {
+    NavigationManager::init_datalogger(refresh_interval, directory, filename);
 }
 
 pub fn set_led(select: UserLed, state: bool) {
