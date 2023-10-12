@@ -1,7 +1,6 @@
-use crate::server::protocols::v1::{packages, websocket};
+use crate::server::protocols::v1::packages;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use std::convert::From;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, RwLock};
@@ -68,9 +67,9 @@ impl NavigationManager {
     }
 
     fn websocket_broadcast() {
-        let package: crate::server::protocols::v1::structures::AnsPackage =
+        // This package is broadcasted when it's created
+        let _package: crate::server::protocols::v1::structures::AnsPackage =
             packages::reading(packages::Sensors::All);
-        websocket::send_to_websockets(json!(package));
     }
 }
 
