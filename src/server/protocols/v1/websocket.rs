@@ -171,22 +171,22 @@ fn request_endpoint(request: &str) -> String {
     let v: Vec<&str> = request.trim_start_matches('/').splitn(5, '/').collect();
     match v[0] {
         "input" => {
-            let package = packages::reading(packages::Sensors::from_str(v[1]).unwrap());
-            json!(package).to_string()
+            let _package = packages::reading(packages::Sensors::from_str(v[1]).unwrap());
+            json!("Ok: Command received").to_string()
         }
         "output" => match v[1] {
             "userled" => {
-                let package;
                 if v.len() == 3 {
-                    package = packages::get_led(hardware_manager::UserLed::from_str(v[2]).unwrap());
-                    json!(package).to_string()
+                    let _package =
+                        packages::get_led(hardware_manager::UserLed::from_str(v[2]).unwrap());
+                    json!("Ok: Command received").to_string()
                 } else if v.len() == 4 {
                     let state: bool = v[3].parse::<bool>().unwrap();
-                    package = packages::set_led(
+                    let _package = packages::set_led(
                         hardware_manager::UserLed::from_str(v[2]).unwrap(),
                         state,
                     );
-                    json!(package).to_string()
+                    json!("Ok: Command received").to_string()
                 } else {
                     json!("Error: Invalid command selected").to_string()
                 }
@@ -198,8 +198,8 @@ fn request_endpoint(request: &str) -> String {
                         v[3].parse::<u8>().unwrap(),
                         v[4].parse::<u8>().unwrap(),
                     );
-                    let package = packages::set_neopixel(vec![[red, green, blue]]);
-                    json!(package).to_string()
+                    let _package = packages::set_neopixel(vec![[red, green, blue]]);
+                    json!("Ok: Command received").to_string()
                 } else {
                     json!("Error: Invalid command selected").to_string()
                 }
@@ -209,8 +209,8 @@ fn request_endpoint(request: &str) -> String {
                     let _package: AnsPackage;
                     if v.len() == 4 {
                         let state: bool = v[3].parse::<bool>().unwrap();
-                        let package = packages::pwm_enable(state);
-                        json!(package).to_string()
+                        let _package = packages::pwm_enable(state);
+                        json!("Ok: Command received").to_string()
                     } else {
                         json!("Error: Invalid command selected").to_string()
                     }
@@ -220,8 +220,8 @@ fn request_endpoint(request: &str) -> String {
                     let _package: AnsPackage;
                     if v.len() == 4 {
                         let freq: f32 = v[3].parse::<f32>().unwrap();
-                        let package = packages::set_pwm_freq_hz(freq);
-                        json!(package).to_string()
+                        let _package = packages::set_pwm_freq_hz(freq);
+                        json!("Ok: Command received").to_string()
                     } else {
                         json!("Error: Invalid command selected").to_string()
                     }
@@ -231,11 +231,11 @@ fn request_endpoint(request: &str) -> String {
                     if v.len() == 4 {
                         let value: u16 = v[3].parse::<u16>().unwrap();
 
-                        let package = packages::pwm_channel_value(
+                        let _package = packages::pwm_channel_value(
                             hardware_manager::PwmChannel::from_str(v[2]).unwrap(),
                             value,
                         );
-                        json!(package).to_string()
+                        json!("Ok: Command received").to_string()
                     } else {
                         json!("Error: Invalid command selected").to_string()
                     }
