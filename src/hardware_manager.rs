@@ -50,9 +50,10 @@ impl NavigationManager {
         &NAVIGATOR
     }
 
-    pub fn init_monitor() {
-        NavigationManager::get_instance().lock().unwrap().monitor =
-            Some(thread::spawn(|| NavigationManager::monitor(500)))
+    pub fn init_monitor(refresh_interval: u64) {
+        NavigationManager::get_instance().lock().unwrap().monitor = Some(thread::spawn(move || {
+            NavigationManager::monitor(refresh_interval)
+        }))
     }
 
     pub fn init_datalogger(refresh_interval: u64, directory: String, filename: String) {
@@ -186,6 +187,9 @@ pub fn init() {
     with_navigator!().init()
 }
 
+pub fn init_monitor(refresh_interval: u64) {
+    NavigationManager::init_monitor(refresh_interval);
+}
 
 pub fn init_datalogger(refresh_interval: u64, file_path: PathBuf) {
     NavigationManager::init_datalogger(refresh_interval, file_path);
