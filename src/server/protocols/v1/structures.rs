@@ -1,16 +1,31 @@
-use derive_new::new;
+use crate::hardware_manager;
+use crate::server::protocols::v1::websocket;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 
-use crate::hardware_manager;
-#[derive(new, Debug, Serialize, Deserialize, Apiv2Schema)]
+#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct AnsPackage {
-    #[new(value = r#""BlueOS_ID_0123".to_owned()"#)]
     pub id: String,
-    #[new(value = r#""Navigator_v4".to_owned()"#)]
     pub model: String,
     #[serde(flatten)]
     pub operation: Operation,
+}
+
+impl AnsPackage {
+    pub fn new(operation: Operation) -> AnsPackage {
+        let package = AnsPackage {
+            id: "BlueOS_ID_0123".to_string(),
+            model: "Navigator_v4".to_string(),
+            operation,
+        };
+
+        // All the AnsPackage's requests can be broadcasted to websocket clients
+        // This helps all clients to be in sync.
+        websocket::send_to_websockets(json!(package));
+
+        package
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
@@ -20,7 +35,7 @@ pub enum Operation {
     Output(OutputRequest),
     Settings,
 }
-#[derive(Debug, Serialize, Deserialize, new)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct OutputRequest {
     pub timestamp: String,
     pub output: Vec<OutputDevices>,
