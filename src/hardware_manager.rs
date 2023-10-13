@@ -62,6 +62,7 @@ impl NavigationManager {
     }
 
     fn monitor(refresh_interval: u64) {
+        log::info!("Monitor started");
         loop {
             let reading = with_navigator!().read_all();
             *DATA.write().unwrap() = Data { state: reading };
@@ -79,6 +80,8 @@ impl NavigationManager {
 
         // Just let monitor run before
         thread::sleep(std::time::Duration::from_millis(500));
+
+        log::info!("Datalogger started");
 
         loop {
             let reading = DATA.read().unwrap().state;
