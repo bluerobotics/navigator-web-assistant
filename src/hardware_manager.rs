@@ -70,7 +70,13 @@ impl NavigationManager {
             let mut lock = Self::get_instance().lock().unwrap();
 
             let reading = navigator_rs::SensorData {
-                adc: lock.navigator.read_adc_all(),
+                adc: {
+                    if refresh_interval < 10 {
+                        navigator_rs::ADCData { channel: [0.0; 4] }
+                    } else {
+                        lock.navigator.read_adc_all()
+                    }
+                },
                 temperature: lock.navigator.read_temperature(),
                 pressure: lock.navigator.read_pressure(),
                 accelerometer: lock.navigator.read_accel(),
