@@ -62,15 +62,25 @@ impl NavigationManager {
     }
 
     fn monitor(refresh_interval: u64) {
-        log::info!("Monitor started");
+        log::info!("Monitor: Started");
         loop {
+            let time_start = std::time::Instant::now();
+
             let reading = with_navigator!().read_all();
             *DATA.write().unwrap() = Data { state: reading };
 
-            // Todo, websockeat inputs broadcast enable, and if sync/not(different interval)
+            let time_elapsed = time_start.elapsed().as_micros() as u64;
+
+            if time_elapsed > refresh_interval * 1000 {
+                log::info!("Monitor: Something went wrong, measurements not concluded with reading interval {refresh_interval} ms, time elapsed: {time_elapsed} ms");
+                NavigationManager::websocket_broadcast();
+                continue;
+            }
+
             NavigationManager::websocket_broadcast();
 
-            thread::sleep(std::time::Duration::from_millis(refresh_interval));
+            let wait = refresh_interval * 1000 - time_elapsed;
+            thread::sleep(std::time::Duration::from_micros(wait));
         }
     }
 
