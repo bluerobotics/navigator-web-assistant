@@ -15,7 +15,8 @@ async fn main() -> std::io::Result<()> {
 
     hardware_manager::init();
 
-    hardware_manager::init_monitor(500);
+    // Sets sensors monitor to 100 Hz
+    hardware_manager::init_monitor(10);
 
     if enable {
         hardware_manager::init_datalogger(rate, directory, filename);
