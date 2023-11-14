@@ -63,6 +63,7 @@ impl NavigationManager {
 
     fn monitor(refresh_interval: u64) {
         log::info!("Monitor: Started");
+        let refresh_interval_us = refresh_interval*1000;
         loop {
             let time_start = std::time::Instant::now();
 
@@ -71,7 +72,7 @@ impl NavigationManager {
 
             let time_elapsed = time_start.elapsed().as_micros() as u64;
 
-            if time_elapsed > refresh_interval * 1000 {
+            if time_elapsed > refresh_interval_us {
                 log::info!("Monitor: Something went wrong, measurements not concluded with reading interval {refresh_interval} ms, time elapsed: {time_elapsed} ms");
                 NavigationManager::websocket_broadcast();
                 continue;
@@ -79,7 +80,7 @@ impl NavigationManager {
 
             NavigationManager::websocket_broadcast();
 
-            let wait = refresh_interval * 1000 - time_elapsed;
+            let wait = refresh_interval_us - time_elapsed;
             thread::sleep(std::time::Duration::from_micros(wait));
         }
     }
