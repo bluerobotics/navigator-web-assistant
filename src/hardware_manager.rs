@@ -84,6 +84,8 @@ impl NavigationManager {
                 gyro: lock.navigator.read_gyro(),
             };
 
+            drop(lock);
+
             *DATA.write().unwrap() = Data { state: reading };
 
             let time_elapsed = time_start.elapsed().as_micros() as u64;
