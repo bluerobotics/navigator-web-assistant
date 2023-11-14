@@ -67,7 +67,17 @@ impl NavigationManager {
         loop {
             let time_start = std::time::Instant::now();
 
-            let reading = with_navigator!().read_all();
+            let mut lock = Self::get_instance().lock().unwrap();
+
+            let reading = navigator_rs::SensorData {
+                adc: lock.navigator.read_adc_all(),
+                temperature: lock.navigator.read_temperature(),
+                pressure: lock.navigator.read_pressure(),
+                accelerometer: lock.navigator.read_accel(),
+                magnetometer: lock.navigator.read_mag(),
+                gyro: lock.navigator.read_gyro(),
+            };
+
             *DATA.write().unwrap() = Data { state: reading };
 
             let time_elapsed = time_start.elapsed().as_micros() as u64;
