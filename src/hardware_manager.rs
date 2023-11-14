@@ -11,6 +11,7 @@ use std::thread;
 struct NavigationManager {
     navigator: navigator_rs::Navigator,
     monitor: Option<std::thread::JoinHandle<()>>,
+    datalogger: Option<std::thread::JoinHandle<()>>,
 }
 #[derive(Debug, Clone, Default, Copy)]
 struct Data {
@@ -57,21 +58,51 @@ impl NavigationManager {
     }
 
     pub fn init_datalogger(refresh_interval: u64, directory: String, filename: String) {
-        NavigationManager::get_instance().lock().unwrap().monitor = Some(thread::spawn(move || {
-            NavigationManager::data_logger(refresh_interval, directory, filename)
-        }))
+        NavigationManager::get_instance().lock().unwrap().datalogger =
+            Some(thread::spawn(move || {
+                NavigationManager::data_logger(refresh_interval, directory, filename)
+            }))
     }
 
     fn monitor(refresh_interval: u64) {
-        log::info!("Monitor started");
+        log::info!("Monitor: Started");
+        let refresh_interval_us = refresh_interval*1000;
         loop {
-            let reading = with_navigator!().read_all();
-            *DATA.write().unwrap() = Data { state: reading };
+            let time_start = std::time::Instant::now();
 
-            // Todo, websockeat inputs broadcast enable, and if sync/not(different interval)
+            let mut lock = Self::get_instance().lock().unwrap();
+
+            let reading = navigator_rs::SensorData {
+                adc: {
+                    if refresh_interval < 10 {
+                        navigator_rs::ADCData { channel: [0.0; 4] }
+                    } else {
+                        lock.navigator.read_adc_all()
+                    }
+                },
+                temperature: lock.navigator.read_temperature(),
+                pressure: lock.navigator.read_pressure(),
+                accelerometer: lock.navigator.read_accel(),
+                magnetometer: lock.navigator.read_mag(),
+                gyro: lock.navigator.read_gyro(),
+            };
+
+            drop(lock);
+
+            DATA.write().unwrap().state = reading;
+
+            let time_elapsed = time_start.elapsed().as_micros() as u64;
+
+            if time_elapsed > refresh_interval_us {
+                log::info!("Monitor: Something went wrong, measurements not concluded with reading interval {refresh_interval} ms, time elapsed: {time_elapsed} ms");
+                NavigationManager::websocket_broadcast();
+                continue;
+            }
+
             NavigationManager::websocket_broadcast();
 
-            thread::sleep(std::time::Duration::from_millis(refresh_interval));
+            let wait = refresh_interval_us - time_elapsed;
+            thread::sleep(std::time::Duration::from_micros(wait));
         }
     }
 
@@ -211,27 +242,55 @@ pub fn set_neopixel(rgb_array: Vec<[u8; 3]>) {
 }
 
 pub fn read_accel() -> AxisData {
-    DATA.read().unwrap().state.accelerometer.into()
+    with_navigator!().read_accel().into()
 }
 
 pub fn read_gyro() -> AxisData {
-    DATA.read().unwrap().state.gyro.into()
+    with_navigator!().read_gyro().into()
 }
 
 pub fn read_mag() -> AxisData {
-    DATA.read().unwrap().state.magnetometer.into()
+    with_navigator!().read_mag().into()
 }
 
 pub fn read_temperature() -> f32 {
-    DATA.read().unwrap().state.temperature
+    with_navigator!().read_temperature()
 }
 
 pub fn read_pressure() -> f32 {
-    DATA.read().unwrap().state.pressure
+    with_navigator!().read_pressure()
 }
 
 pub fn read_adc_all() -> ADCData {
-    DATA.read().unwrap().state.adc.into()
+    with_navigator!().read_adc_all().into()
+}
+
+pub mod cached {
+    use super::{ADCData, AxisData, DATA};
+
+    pub fn read_accel() -> AxisData {
+        DATA.read().unwrap().state.accelerometer.into()
+    }
+
+    pub fn read_gyro() -> AxisData {
+        DATA.read().unwrap().state.gyro.into()
+    }
+
+    pub fn read_mag() -> AxisData {
+        DATA.read().unwrap().state.magnetometer.into()
+    }
+
+    pub fn read_temperature() -> f32 {
+        DATA.read().unwrap().state.temperature
+    }
+
+    pub fn read_pressure() -> f32 {
+        DATA.read().unwrap().state.pressure
+    }
+
+    pub fn read_adc_all() -> ADCData {
+        DATA.read().unwrap().state.adc.into()
+    }
 }
 
 pub fn set_pwm_channel_value(channel: PwmChannel, value: u16) {
