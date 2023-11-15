@@ -240,27 +240,27 @@ pub fn set_neopixel(rgb_array: Vec<[u8; 3]>) {
 }
 
 pub fn read_accel() -> AxisData {
-    DATA.read().unwrap().state.accelerometer.into()
+    with_navigator!().read_accel().into()
 }
 
 pub fn read_gyro() -> AxisData {
-    DATA.read().unwrap().state.gyro.into()
+    with_navigator!().read_gyro().into()
 }
 
 pub fn read_mag() -> AxisData {
-    DATA.read().unwrap().state.magnetometer.into()
+    with_navigator!().read_mag().into()
 }
 
 pub fn read_temperature() -> f32 {
-    DATA.read().unwrap().state.temperature
+    with_navigator!().read_temperature()
 }
 
 pub fn read_pressure() -> f32 {
-    DATA.read().unwrap().state.pressure
+    with_navigator!().read_pressure()
 }
 
 pub fn read_adc_all() -> ADCData {
-    DATA.read().unwrap().state.adc.into()
+    with_navigator!().read_adc_all().into()
 }
 
 pub fn set_pwm_channel_value(channel: PwmChannel, value: u16) {
