@@ -66,7 +66,7 @@ impl NavigationManager {
 
     fn monitor(refresh_interval: u64) {
         log::info!("Monitor: Started");
-        let refresh_interval_us = refresh_interval*1000;
+        let refresh_interval_us = refresh_interval * 1000;
         loop {
             let time_start = std::time::Instant::now();
 
