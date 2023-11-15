@@ -49,7 +49,19 @@ async fn init() -> Result<Json<AnsPackage>, Error> {
 #[api_v2_operation]
 #[get("v1/input/{sensor}")]
 async fn get_sensor(sensor: web::Path<String>) -> Result<Json<AnsPackage>, Error> {
-    let package = packages::reading(packages::Sensors::from_str(&sensor.into_inner()).unwrap());
+    let package = packages::reading(
+        packages::Sensors::from_str(&sensor.into_inner()).unwrap(),
+        false,
+    );
+    Ok(Json(package))
+}
+#[api_v2_operation]
+#[get("v1/input/{sensor}/cached")]
+async fn get_sensor_cached(sensor: web::Path<String>) -> Result<Json<AnsPackage>, Error> {
+    let package = packages::reading(
+        packages::Sensors::from_str(&sensor.into_inner()).unwrap(),
+        true,
+    );
     Ok(Json(package))
 }
 #[api_v2_operation]
@@ -116,6 +128,7 @@ pub fn register_services(cfg: &mut web::ServiceConfig) {
         .service(dist)
         .service(echo)
         .service(get_sensor)
+        .service(get_sensor_cached)
         .service(get_led)
         .service(get_server_metadata)
         .service(post_pwm_enable)
