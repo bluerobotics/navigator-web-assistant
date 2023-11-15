@@ -6,21 +6,24 @@ mod server;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    let (directory, filename, rate, enable) = cli::parse_args();
-    println!(
-        "Starting service with: {} {} {} {}",
-        directory, filename, rate, enable
-    );
+    let (datalogger_settings, monitor_settings) = cli::parse_args();
+    println!("Starting navigator webservice with: {datalogger_settings:?} {monitor_settings:?}",);
     logger::init();
 
     hardware_manager::init();
 
-    // Sets sensors monitor to 100 Hz
-    hardware_manager::init_monitor(10);
+    if monitor_settings.enable {
+        hardware_manager::init_monitor(monitor_settings.rate);
+        log::info!("starting monitor...");
+        hardware_manager::init_monitor(monitor_settings.interval);
+    }
 
-    if enable {
-        hardware_manager::init_datalogger(rate, directory, filename);
-        log::info!("starting datalogger...");
+    if datalogger_settings.enable {
+        hardware_manager::init_datalogger(
+            datalogger_settings.rate,
+            datalogger_settings.directory,
+            datalogger_settings.filename,
+        );
     }
 
     server::run().await.unwrap();
