@@ -244,6 +244,7 @@ pub fn reading(selection: Sensors, cache: bool) -> AnsPackage {
                 Sensors::All => {}
             }
         }
+    }
 
     AnsPackage::new(Operation::Input(sensor_reading))
 }
