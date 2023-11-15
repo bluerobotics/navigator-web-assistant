@@ -128,7 +128,7 @@ impl NavigationManager {
     fn websocket_broadcast() {
         // This package is broadcasted when it's created
         let _package: crate::server::protocols::v1::structures::AnsPackage =
-            packages::reading(packages::Sensors::All);
+            packages::reading(packages::Sensors::All, true);
     }
 }
 
