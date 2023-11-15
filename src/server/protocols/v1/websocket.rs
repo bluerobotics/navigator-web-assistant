@@ -171,7 +171,7 @@ fn request_endpoint(request: &str) -> String {
     let v: Vec<&str> = request.trim_start_matches('/').splitn(5, '/').collect();
     match v[0] {
         "input" => {
-            let _package = packages::reading(packages::Sensors::from_str(v[1]).unwrap());
+            let _package = packages::reading(packages::Sensors::from_str(v[1]).unwrap(), false);
             json!("Ok: Command received").to_string()
         }
         "output" => match v[1] {
