@@ -10,6 +10,7 @@ use std::thread;
 struct NavigationManager {
     navigator: navigator_rs::Navigator,
     monitor: Option<std::thread::JoinHandle<()>>,
+    datalogger: Option<std::thread::JoinHandle<()>>,
 }
 #[derive(Debug, Clone, Default, Copy)]
 struct Data {
@@ -56,9 +57,10 @@ impl NavigationManager {
     }
 
     pub fn init_datalogger(refresh_interval: u64, directory: String, filename: String) {
-        NavigationManager::get_instance().lock().unwrap().monitor = Some(thread::spawn(move || {
-            NavigationManager::data_logger(refresh_interval, directory, filename)
-        }))
+        NavigationManager::get_instance().lock().unwrap().datalogger =
+            Some(thread::spawn(move || {
+                NavigationManager::data_logger(refresh_interval, directory, filename)
+            }))
     }
 
     fn monitor(refresh_interval: u64) {
