@@ -164,7 +164,7 @@ pub fn set_neopixel(rgb_array: Vec<[u8; 3]>) -> AnsPackage {
     }))
 }
 
-pub fn reading(selection: Sensors) -> AnsPackage {
+pub fn reading(selection: Sensors, cache: bool) -> AnsPackage {
     let mut sensor_reading = InputRequest {
         timestamp: chrono::Utc::now().to_string(),
         ..Default::default()
@@ -184,35 +184,66 @@ pub fn reading(selection: Sensors) -> AnsPackage {
         _ => vec![selection],
     };
 
-    for selection in selection_array {
-        match selection {
-            Sensors::Temperature => sensor_reading.input.push(InputDevices::new(
-                InputDeviceType::Temperature,
-                Value::Single(hardware_manager::read_temperature()),
-            )),
-            Sensors::Pressure => sensor_reading.input.push(InputDevices::new(
-                InputDeviceType::Pressure,
-                Value::Single(hardware_manager::read_pressure()),
-            )),
-            Sensors::Accelerometer => sensor_reading.input.push(InputDevices::new(
-                InputDeviceType::Accelerometer,
-                Value::Array(hardware_manager::read_accel().into()),
-            )),
-            Sensors::Gyroscope => sensor_reading.input.push(InputDevices::new(
-                InputDeviceType::Gyroscope,
-                Value::Array(hardware_manager::read_gyro().into()),
-            )),
-            Sensors::Magnetometer => sensor_reading.input.push(InputDevices::new(
-                InputDeviceType::Magnetometer,
-                Value::Array(hardware_manager::read_mag().into()),
-            )),
-            Sensors::Adc => sensor_reading.input.push(InputDevices::new(
-                InputDeviceType::Adc,
-                Value::Array(hardware_manager::read_adc_all().into()),
-            )),
-            Sensors::All => {}
+    if !cache {
+        for selection in selection_array {
+            match selection {
+                Sensors::Temperature => sensor_reading.input.push(InputDevices::new(
+                    InputDeviceType::Temperature,
+                    Value::Single(hardware_manager::read_temperature()),
+                )),
+                Sensors::Pressure => sensor_reading.input.push(InputDevices::new(
+                    InputDeviceType::Pressure,
+                    Value::Single(hardware_manager::read_pressure()),
+                )),
+                Sensors::Accelerometer => sensor_reading.input.push(InputDevices::new(
+                    InputDeviceType::Accelerometer,
+                    Value::Array(hardware_manager::read_accel().into()),
+                )),
+                Sensors::Gyroscope => sensor_reading.input.push(InputDevices::new(
+                    InputDeviceType::Gyroscope,
+                    Value::Array(hardware_manager::read_gyro().into()),
+                )),
+                Sensors::Magnetometer => sensor_reading.input.push(InputDevices::new(
+                    InputDeviceType::Magnetometer,
+                    Value::Array(hardware_manager::read_mag().into()),
+                )),
+                Sensors::Adc => sensor_reading.input.push(InputDevices::new(
+                    InputDeviceType::Adc,
+                    Value::Array(hardware_manager::read_adc_all().into()),
+                )),
+                Sensors::All => {}
+            }
         }
-    }
+    } else {
+        for selection in selection_array {
+            match selection {
+                Sensors::Temperature => sensor_reading.input.push(InputDevices::new(
+                    InputDeviceType::Temperature,
+                    Value::Single(hardware_manager::cached::read_temperature()),
+                )),
+                Sensors::Pressure => sensor_reading.input.push(InputDevices::new(
+                    InputDeviceType::Pressure,
+                    Value::Single(hardware_manager::cached::read_pressure()),
+                )),
+                Sensors::Accelerometer => sensor_reading.input.push(InputDevices::new(
+                    InputDeviceType::Accelerometer,
+                    Value::Array(hardware_manager::cached::read_accel().into()),
+                )),
+                Sensors::Gyroscope => sensor_reading.input.push(InputDevices::new(
+                    InputDeviceType::Gyroscope,
+                    Value::Array(hardware_manager::cached::read_gyro().into()),
+                )),
+                Sensors::Magnetometer => sensor_reading.input.push(InputDevices::new(
+                    InputDeviceType::Magnetometer,
+                    Value::Array(hardware_manager::cached::read_mag().into()),
+                )),
+                Sensors::Adc => sensor_reading.input.push(InputDevices::new(
+                    InputDeviceType::Adc,
+                    Value::Array(hardware_manager::cached::read_adc_all().into()),
+                )),
+                Sensors::All => {}
+            }
+        }
 
     AnsPackage::new(Operation::Input(sensor_reading))
 }
