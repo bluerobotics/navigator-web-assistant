@@ -263,6 +263,34 @@ pub fn read_adc_all() -> ADCData {
     with_navigator!().read_adc_all().into()
 }
 
+pub mod cached {
+    use super::{ADCData, AxisData, DATA};
+
+    pub fn read_accel() -> AxisData {
+        DATA.read().unwrap().state.accelerometer.into()
+    }
+
+    pub fn read_gyro() -> AxisData {
+        DATA.read().unwrap().state.gyro.into()
+    }
+
+    pub fn read_mag() -> AxisData {
+        DATA.read().unwrap().state.magnetometer.into()
+    }
+
+    pub fn read_temperature() -> f32 {
+        DATA.read().unwrap().state.temperature
+    }
+
+    pub fn read_pressure() -> f32 {
+        DATA.read().unwrap().state.pressure
+    }
+
+    pub fn read_adc_all() -> ADCData {
+        DATA.read().unwrap().state.adc.into()
+    }
+}
+
 pub fn set_pwm_channel_value(channel: PwmChannel, value: u16) {
     with_navigator!().set_pwm_channel_value(channel.into(), value)
 }
