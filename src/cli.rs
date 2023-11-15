@@ -7,20 +7,17 @@ pub fn parse_args() -> (String, String, u64, bool) {
         .about("Start your navigator assistant server")
         .arg(
             Arg::new("datalogger_directory")
-                .short('d')
-                .long("directory")
+                .long("datalogger-directory")
                 .required(false),
         )
         .arg(
             Arg::new("datalogger_filename")
-                .short('f')
-                .long("filename")
+                .long("datalogger-filename")
                 .required(false),
         )
         .arg(
             Arg::new("datalogger_rate")
-                .short('r')
-                .long("rate")
+                .long("datalogger-rate")
                 .value_parser(clap::value_parser!(u64))
                 .required(false),
         )
