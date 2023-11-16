@@ -20,3 +20,46 @@ jobs:
         run: cargo clippy
       - name: Build
         run: cargo build
+
+  build-bin:
+    needs: quick-tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - TARGET: armv7-unknown-linux-gnueabihf
+        - TARGET: aarch64-unknown-linux-gnu
+        - TARGET: armv7-unknown-linux-musleabihf
+        - TARGET: aarch64-unknown-linux-musl
+    steps:
+    - name: Building ${{ matrix.TARGET }}
+      run: echo "${{ matrix.TARGET }}"
+    - uses: actions/checkout@v3
+    - name: Rust Setup
+      uses: actions-rs/toolchain@v1.0.1
+      with:
+       toolchain: stable
+       target: ${{ matrix.TARGET }}
+       override: true
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2
+      with:
+       prefix-key: "rust-cache"
+       shared-key: "build-bin-${{ matrix.TARGET }}"
+    - name: Rust Cross Build
+      uses: actions-rs/cargo@v1
+      with:
+       use-cross: true
+       command: build
+       args: --verbose --release --target=${{ matrix.TARGET }}
+    - name: Move to it's target
+      run: |
+        mkdir dist
+        mkdir "dist/${{ matrix.TARGET }}"
+        mv $(find "./target" -type f -name "navigator-assistant") "dist/${{ matrix.TARGET }}"
+    - name: Upload bin
+      uses: actions/upload-artifact@v3
+      with:
+       name: bin
+       path: dist
