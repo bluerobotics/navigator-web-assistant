@@ -52,16 +52,23 @@ impl NavigationManager {
     }
 
     pub fn init_monitor(refresh_interval: u64) {
-        NavigationManager::get_instance().lock().unwrap().monitor = Some(thread::spawn(move || {
-            NavigationManager::monitor(refresh_interval)
-        }))
+        NavigationManager::get_instance().lock().unwrap().monitor = Some(
+            thread::Builder::new()
+                .name("Monitor".into())
+                .spawn(move || NavigationManager::monitor(refresh_interval))
+                .expect("Error: Navigator service: Monitor can't setup thread"),
+        )
     }
 
-    pub fn init_datalogger(refresh_interval: u64, directory: String, filename: String) {
-        NavigationManager::get_instance().lock().unwrap().datalogger =
-            Some(thread::spawn(move || {
-                NavigationManager::data_logger(refresh_interval, directory, filename)
-            }))
+    pub fn init_datalogger(refresh_interval: u64, file_path: PathBuf) {
+        NavigationManager::get_instance().lock().unwrap().datalogger = Some(
+            thread::Builder::new()
+                .name("Datalogger".into())
+                .spawn(move || {
+                    NavigationManager::data_logger(refresh_interval, file_path)
+                })
+                .expect("Error: Navigator service: Datalogger can't setup thread"),
+        )
     }
 
     fn monitor(refresh_interval: u64) {
