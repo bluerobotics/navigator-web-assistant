@@ -1,0 +1,22 @@
+name: Test all targets
+
+on: [push, pull_request]
+
+permissions:
+  contents: write
+
+jobs:
+  quick-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions-rs/toolchain@v1.0.6
+        with:
+          toolchain: stable
+          override: true
+      - name: Check Type
+        run: cargo fmt -- --check
+      - name: Check Clippy
+        run: cargo clippy
+      - name: Build
+        run: cargo build
