@@ -4,13 +4,13 @@ use clap::{Arg, Command};
 pub struct DataloggerSettings {
     pub directory: String,
     pub filename: String,
-    pub rate: u64,
+    pub interval: u64,
     pub enable: bool,
 }
 
 #[derive(Debug)]
 pub struct MonitorSettings {
-    pub rate: u64,
+    pub interval: u64,
     pub enable: bool,
 }
 
@@ -30,8 +30,8 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
                 .required(false),
         )
         .arg(
-            Arg::new("datalogger_rate")
-                .long("datalogger-rate")
+            Arg::new("datalogger_interval")
+                .long("datalogger-interval")
                 .value_parser(clap::value_parser!(u64))
                 .required(false),
         )
@@ -42,8 +42,8 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
                 .required(false),
         )
         .arg(
-            Arg::new("monitor_rate")
-                .long("monitor-rate")
+            Arg::new("monitor_interval")
+                .long("monitor-interval")
                 .value_parser(clap::value_parser!(u64))
                 .required(false),
         )
@@ -65,8 +65,8 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
         .map(|f| f.to_string())
         .unwrap_or("data.csv".to_string());
 
-    let datalogger_rate = matches
-        .get_one::<u64>("datalogger_rate")
+    let datalogger_interval = matches
+        .get_one::<u64>("datalogger_interval")
         .copied()
         .unwrap_or(60000);
 
@@ -75,8 +75,8 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
         .copied()
         .unwrap_or(false);
 
-    let monitor_rate = matches
-        .get_one::<u64>("monitor_rate")
+    let monitor_interval = matches
+        .get_one::<u64>("monitor_interval")
         .copied()
         .unwrap_or(10);
 
@@ -88,12 +88,12 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
     let datalogger_settings = DataloggerSettings {
         directory: datalogger_directory,
         filename: datalogger_filename,
-        rate: datalogger_rate,
+        interval: datalogger_interval,
         enable: datalogger_enable,
     };
 
     let monitor_settings = MonitorSettings {
-        rate: monitor_rate,
+        interval: monitor_interval,
         enable: monitor_enable,
     };
 
