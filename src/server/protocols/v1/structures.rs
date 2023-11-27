@@ -6,7 +6,6 @@ use serde_json::json;
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct AnsPackage {
-    pub id: String,
     pub model: String,
     #[serde(flatten)]
     pub operation: Operation,
@@ -15,7 +14,6 @@ pub struct AnsPackage {
 impl AnsPackage {
     pub fn new(operation: Operation) -> AnsPackage {
         let package = AnsPackage {
-            id: "BlueOS_ID_0123".to_string(),
             model: "Navigator_v4".to_string(),
             operation,
         };
