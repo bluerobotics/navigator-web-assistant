@@ -14,9 +14,15 @@ You can also use the Jupyter extension to try some fast python and websocket app
 [instructions]: https://github.com/RaulTrombin/blueos-navigator-assitant
 ## Instructions
 
-To use navigator assistant simply:
+To use navigator assistant simply execute:
 ```
 ./navigator-assistant
+```
+
+To disable navigator monitor:
+
+```
+./navigator-assistant --monitor-enable false
 ```
 
 To enable datalogger service with default values:
@@ -26,8 +32,16 @@ To enable datalogger service with default values:
 
 To change datalogger service values:
 ```
-./navigator-assistant --enable true --rate 60000 --directory ./ --filename data.csv
+./navigator-assistant --datalogger-enable true --datalogger-interval 60000 --datalogger-directory ./ --datalogger-filename data.csv
 ```
+
+To change navigator monitor's refresh interval:
+
+```
+./navigator-assistant --monitor-interval 10
+```
+
+*The interval values use ms.
 
 ## Webpage
 
