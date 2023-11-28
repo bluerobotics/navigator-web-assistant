@@ -83,7 +83,7 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
     let monitor_enable = matches
         .get_one::<bool>("monitor_enable")
         .copied()
-        .unwrap_or(false);
+        .unwrap_or(true);
 
     let datalogger_settings = DataloggerSettings {
         directory: datalogger_directory,
