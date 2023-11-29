@@ -195,7 +195,7 @@
         }
 
         function updateSensorReadings() {
-            fetch(`${baseUrl}/v1/input/all`, {
+            fetch(`${baseUrl}/v1/input/all/cached`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
