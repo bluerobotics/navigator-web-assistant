@@ -65,14 +65,14 @@ async fn get_sensor_cached(sensor: web::Path<String>) -> Result<Json<AnsPackage>
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[get("v1/output/userled/{userled}")]
+#[get("v1/output/user_led/{userled}")]
 async fn get_led(userled: web::Path<String>) -> Result<Json<AnsPackage>, Error> {
     let package =
         packages::get_led(hardware_manager::UserLed::from_str(&userled.into_inner()).unwrap());
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[post("v1/output/userled/{userled}/{value}")]
+#[post("v1/output/user_led/{userled}/{value}")]
 async fn post_led(path: web::Path<(String, bool)>) -> Result<Json<AnsPackage>, Error> {
     let (userled, value) = path.into_inner();
     let package = packages::set_led(
