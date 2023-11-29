@@ -94,6 +94,10 @@
                         <button id="stop-update" disabled>Stop Update</button>
                     </fieldset>
                     <fieldset>
+                        <legend>Last Update</legend>
+                        <span id="last-update-timestamp"></span>
+                    </fieldset>
+                    <fieldset>
                         <legend>Readings</legend>
                         <table>
                             <tr>
@@ -191,7 +195,7 @@
         }
 
         function updateSensorReadings() {
-            fetch(`${baseUrl}/v1/input/all`, {
+            fetch(`${baseUrl}/v1/input/all/cached`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -217,6 +221,22 @@
                         } else {
                             valueCell.textContent = input.value.toFixed(2);
                         }
+
+                        const lastUpdateTimestamp = document.getElementById("last-update-timestamp");
+                        const timestamp = new Date(data.timestamp);
+
+                        const day = timestamp.getDate();
+                        const month = timestamp.getMonth() + 1; // Month is zero-based
+                        const year = timestamp.getFullYear();
+                        const hour = timestamp.getHours();
+                        const minute = timestamp.getMinutes();
+                        const second = timestamp.getSeconds();
+                        const milisecond = timestamp.getMilliseconds();
+
+                        lastUpdateTimestamp.innerHTML = `
+                            Date: ${day}/${month}/${year}<br>
+                            Time: ${hour}:${minute}:${second}.${milisecond}
+                        `;
 
                     });
                 })
