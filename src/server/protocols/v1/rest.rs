@@ -10,12 +10,21 @@ use mime_guess::from_path;
 use paperclip::actix::{
     api_v2_operation, get, post,
     web::{self, HttpResponse, Json},
+    Apiv2Schema,
 };
+use serde::{Deserialize, Serialize};
 use std::{str::FromStr, vec};
 
 #[derive(rust_embed::RustEmbed)]
 #[folder = "src/server/protocols/v1/frontend"]
 struct Asset;
+
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
+pub struct ApiNeopixel {
+    red: u8,
+    green: u8,
+    blue: u8,
+}
 
 fn handle_embedded_file(path: &str) -> HttpResponse {
     match Asset::get(path) {
@@ -82,10 +91,10 @@ async fn post_led(path: web::Path<(String, bool)>) -> Result<Json<AnsPackage>, E
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[post("v1/output/neopixel/{red}/{green}/{blue}")]
-async fn post_neopixel(path: web::Path<(u8, u8, u8)>) -> Result<Json<AnsPackage>, Error> {
-    let (red, green, blue) = path.into_inner();
-    let package = packages::set_neopixel(vec![[red, green, blue]]);
+#[post("v1/output/neopixel/")]
+async fn post_neopixel(json: web::Json<ApiNeopixel>) -> Result<Json<AnsPackage>, Error> {
+    let neopixel = json.into_inner();
+    let package = packages::set_neopixel(vec![[neopixel.red, neopixel.green, neopixel.blue]]);
     Ok(Json(package))
 }
 #[api_v2_operation]
