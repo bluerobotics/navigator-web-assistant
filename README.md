@@ -22,26 +22,26 @@ To use navigator assistant simply execute:
 To disable navigator monitor:
 
 ```
-./navigator-assistant --monitor-enable false
+./navigator-assistant --monitor-rate 0
 ```
 
 To enable datalogger service with default values:
 ```
-./navigator-assistant --enable true
+./navigator-assistant --datalogger-rate 1
 ```
 
 To change datalogger service values:
 ```
-./navigator-assistant --datalogger-enable true --datalogger-interval 60000 --datalogger-directory ./ --datalogger-filename data.csv
+./navigator-assistant --datalogger-rate 0.0017 --datalogger-directory ./ --datalogger-filename data.csv
 ```
 
-To change navigator monitor's refresh interval:
+To change navigator monitor's refresh rate:
 
 ```
-./navigator-assistant --monitor-interval 10
+./navigator-assistant --monitor-rate 10
 ```
 
-*The interval values use ms.
+*The rate values use Hz.
 
 ## Webpage
 
