@@ -12,12 +12,12 @@ async fn main() -> std::io::Result<()> {
 
     hardware_manager::init();
 
-    if monitor_settings.enable {
+    if monitor_settings.interval != 0 {
         hardware_manager::init_monitor(monitor_settings.interval);
         log::info!("starting monitor...");
     }
 
-    if datalogger_settings.enable {
+    if datalogger_settings.interval != 0 {
         hardware_manager::init_datalogger(
             datalogger_settings.interval,
             datalogger_settings.directory,
