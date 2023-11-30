@@ -5,13 +5,11 @@ pub struct DataloggerSettings {
     pub directory: String,
     pub filename: String,
     pub interval: u64,
-    pub enable: bool,
 }
 
 #[derive(Debug)]
 pub struct MonitorSettings {
     pub interval: u64,
-    pub enable: bool,
 }
 
 pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
@@ -30,9 +28,9 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
                 .required(false),
         )
         .arg(
-            Arg::new("datalogger_interval")
-                .long("datalogger-interval")
-                .value_parser(clap::value_parser!(u64))
+            Arg::new("datalogger_rate")
+                .long("datalogger-rate")
+                .value_parser(clap::value_parser!(f64))
                 .required(false),
         )
         .arg(
@@ -42,9 +40,9 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
                 .required(false),
         )
         .arg(
-            Arg::new("monitor_interval")
-                .long("monitor-interval")
-                .value_parser(clap::value_parser!(u64))
+            Arg::new("monitor_rate")
+                .long("monitor-rate")
+                .value_parser(clap::value_parser!(f64))
                 .required(false),
         )
         .arg(
@@ -65,37 +63,33 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
         .map(|f| f.to_string())
         .unwrap_or("data.csv".to_string());
 
-    let datalogger_interval = matches
-        .get_one::<u64>("datalogger_interval")
+    let datalogger_rate = matches
+        .get_one::<f64>("datalogger_rate")
         .copied()
-        .unwrap_or(60000);
+        .unwrap_or(0.0);
 
-    let datalogger_enable = matches
-        .get_one::<bool>("datalogger_enable")
+    let monitor_rate = matches
+        .get_one::<f64>("monitor_rate")
         .copied()
-        .unwrap_or(false);
-
-    let monitor_interval = matches
-        .get_one::<u64>("monitor_interval")
-        .copied()
-        .unwrap_or(10);
-
-    let monitor_enable = matches
-        .get_one::<bool>("monitor_enable")
-        .copied()
-        .unwrap_or(true);
+        .unwrap_or(100.0);
 
     let datalogger_settings = DataloggerSettings {
         directory: datalogger_directory,
         filename: datalogger_filename,
-        interval: datalogger_interval,
-        enable: datalogger_enable,
+        interval: hz_to_us(datalogger_rate),
     };
 
     let monitor_settings = MonitorSettings {
-        interval: monitor_interval,
-        enable: monitor_enable,
+        interval: hz_to_us(monitor_rate),
     };
 
     (datalogger_settings, monitor_settings)
+}
+
+fn hz_to_us(rate_hz: f64) -> u64 {
+    if rate_hz == 0.0 {
+        return 0;
+    };
+    let us_per_second = 1_000_000.0;
+    (us_per_second / rate_hz) as u64
 }
