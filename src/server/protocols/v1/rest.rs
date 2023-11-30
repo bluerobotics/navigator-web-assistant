@@ -26,6 +26,22 @@ pub struct ApiNeopixel {
     blue: u8,
 }
 
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
+pub struct ApiPwmEnable {
+    enable: bool,
+}
+
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
+pub struct ApiPwmChannelValue {
+    channel: String,
+    value: u16,
+}
+
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
+pub struct ApiPwmFrequency {
+    frequency: f32,
+}
+
 fn handle_embedded_file(path: &str) -> HttpResponse {
     match Asset::get(path) {
         Some(content) => HttpResponse::Ok()
@@ -98,27 +114,27 @@ async fn post_neopixel(json: web::Json<ApiNeopixel>) -> Result<Json<AnsPackage>,
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[post("v1/output/pwm/{channel}/{value}")]
-async fn post_pwm(path: web::Path<(String, u16)>) -> Result<Json<AnsPackage>, Error> {
-    let (channel, value) = path.into_inner();
+#[post("v1/output/pwm/channel/value")]
+async fn post_pwm(json: web::Json<ApiPwmChannelValue>) -> Result<Json<AnsPackage>, Error> {
+    let pwm = json.into_inner();
     let package = packages::pwm_channel_value(
-        hardware_manager::PwmChannel::from_str(channel.as_str()).unwrap(),
-        value,
+        hardware_manager::PwmChannel::from_str(pwm.channel.as_str()).unwrap(),
+        pwm.value,
     );
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[post("v1/output/pwm/enable/{bool}")]
-async fn post_pwm_enable(path: web::Path<bool>) -> Result<Json<AnsPackage>, Error> {
-    let bool = path.into_inner();
+#[post("v1/output/pwm/enable/")]
+async fn post_pwm_enable(json: web::Json<ApiPwmEnable>) -> Result<Json<AnsPackage>, Error> {
+    let bool = json.into_inner().enable;
     let package = packages::pwm_enable(bool);
     Ok(Json(package))
 }
 
 #[api_v2_operation]
-#[post("v1/output/pwm/frequency/{frequency}")]
-async fn post_pwm_frequency(path: web::Path<f32>) -> Result<Json<AnsPackage>, Error> {
-    let frequency = path.into_inner();
+#[post("v1/output/pwm/frequency/")]
+async fn post_pwm_frequency(json: web::Json<ApiPwmFrequency>) -> Result<Json<AnsPackage>, Error> {
+    let frequency = json.into_inner().frequency;
     let package = packages::set_pwm_freq_hz(frequency);
     hardware_manager::pwm_enable(true);
     Ok(Json(package))
