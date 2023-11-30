@@ -28,9 +28,9 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
                 .required(false),
         )
         .arg(
-            Arg::new("datalogger_interval")
-                .long("datalogger-interval")
-                .value_parser(clap::value_parser!(u64))
+            Arg::new("datalogger_rate")
+                .long("datalogger-rate")
+                .value_parser(clap::value_parser!(f64))
                 .required(false),
         )
         .arg(
@@ -40,9 +40,9 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
                 .required(false),
         )
         .arg(
-            Arg::new("monitor_interval")
-                .long("monitor-interval")
-                .value_parser(clap::value_parser!(u64))
+            Arg::new("monitor_rate")
+                .long("monitor-rate")
+                .value_parser(clap::value_parser!(f64))
                 .required(false),
         )
         .arg(
@@ -63,15 +63,15 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
         .map(|f| f.to_string())
         .unwrap_or("data.csv".to_string());
 
-    let datalogger_interval = matches
-        .get_one::<u64>("datalogger_interval")
+    let datalogger_rate = matches
+        .get_one::<f64>("datalogger_rate")
         .copied()
-        .unwrap_or(60000);
+        .unwrap_or(0.0);
 
-    let monitor_interval = matches
-        .get_one::<u64>("monitor_interval")
+    let monitor_rate = matches
+        .get_one::<f64>("monitor_rate")
         .copied()
-        .unwrap_or(10);
+        .unwrap_or(100.0);
 
     let datalogger_settings = DataloggerSettings {
         directory: datalogger_directory,
