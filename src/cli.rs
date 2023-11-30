@@ -5,13 +5,11 @@ pub struct DataloggerSettings {
     pub directory: String,
     pub filename: String,
     pub interval: u64,
-    pub enable: bool,
 }
 
 #[derive(Debug)]
 pub struct MonitorSettings {
     pub interval: u64,
-    pub enable: bool,
 }
 
 pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
@@ -70,20 +68,10 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
         .copied()
         .unwrap_or(60000);
 
-    let datalogger_enable = matches
-        .get_one::<bool>("datalogger_enable")
-        .copied()
-        .unwrap_or(false);
-
     let monitor_interval = matches
         .get_one::<u64>("monitor_interval")
         .copied()
         .unwrap_or(10);
-
-    let monitor_enable = matches
-        .get_one::<bool>("monitor_enable")
-        .copied()
-        .unwrap_or(true);
 
     let datalogger_settings = DataloggerSettings {
         directory: datalogger_directory,
