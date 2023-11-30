@@ -42,6 +42,12 @@ pub struct ApiPwmFrequency {
     frequency: f32,
 }
 
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
+pub struct ApiUserLed {
+    userled: String,
+    value: bool,
+}
+
 fn handle_embedded_file(path: &str) -> HttpResponse {
     match Asset::get(path) {
         Some(content) => HttpResponse::Ok()
@@ -97,12 +103,12 @@ async fn get_led(userled: web::Path<String>) -> Result<Json<AnsPackage>, Error> 
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[post("v1/output/user_led/{userled}/{value}")]
-async fn post_led(path: web::Path<(String, bool)>) -> Result<Json<AnsPackage>, Error> {
-    let (userled, value) = path.into_inner();
+#[post("v1/output/user_led/")]
+async fn post_led(json: web::Json<ApiUserLed>) -> Result<Json<AnsPackage>, Error> {
+    let userled = json.into_inner();
     let package = packages::set_led(
-        hardware_manager::UserLed::from_str(userled.as_str()).unwrap(),
-        value,
+        hardware_manager::UserLed::from_str(userled.userled.as_str()).unwrap(),
+        userled.value,
     );
     Ok(Json(package))
 }
