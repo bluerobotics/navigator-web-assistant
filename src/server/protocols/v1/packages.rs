@@ -95,7 +95,7 @@ pub fn pwm_channel_value(channel: hardware_manager::PwmChannel, value: u16) -> A
     };
     let package = OutputRequest {
         timestamp: chrono::Utc::now().to_string(),
-        output: vec![OutputDevices::PWM(pwm)],
+        output: vec![OutputDevices::Pwm(pwm)],
     };
     AnsPackage::new(Operation::Output(package))
 }
@@ -110,7 +110,7 @@ pub fn pwm_enable(state: bool) -> AnsPackage {
     };
     let package = OutputRequest {
         timestamp: chrono::Utc::now().to_string(),
-        output: vec![OutputDevices::PWM(pwm)],
+        output: vec![OutputDevices::Pwm(pwm)],
     };
     AnsPackage::new(Operation::Output(package))
 }
@@ -125,7 +125,7 @@ pub fn set_pwm_freq_hz(freq: f32) -> AnsPackage {
     };
     let package = OutputRequest {
         timestamp: chrono::Utc::now().to_string(),
-        output: vec![OutputDevices::PWM(pwm)],
+        output: vec![OutputDevices::Pwm(pwm)],
     };
     AnsPackage::new(Operation::Output(package))
 }
