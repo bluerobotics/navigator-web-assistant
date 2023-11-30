@@ -76,14 +76,20 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
     let datalogger_settings = DataloggerSettings {
         directory: datalogger_directory,
         filename: datalogger_filename,
-        interval: datalogger_interval,
-        enable: datalogger_enable,
+        interval: hz_to_us(datalogger_rate),
     };
 
     let monitor_settings = MonitorSettings {
-        interval: monitor_interval,
-        enable: monitor_enable,
+        interval: hz_to_us(monitor_rate),
     };
 
     (datalogger_settings, monitor_settings)
+}
+
+fn hz_to_us(rate_hz: f64) -> u64 {
+    if rate_hz == 0.0 {
+        return 0;
+    };
+    let us_per_second = 1_000_000.0;
+    (us_per_second / rate_hz) as u64
 }
