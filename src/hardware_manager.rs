@@ -71,9 +71,8 @@ impl NavigationManager {
         )
     }
 
-    fn monitor(refresh_interval: u64) {
+    fn monitor(refresh_interval_us: u64) {
         log::info!("Monitor: Started");
-        let refresh_interval_us = refresh_interval * 1000;
         loop {
             let time_start = std::time::Instant::now();
 
@@ -81,7 +80,7 @@ impl NavigationManager {
 
             let reading = navigator_rs::SensorData {
                 adc: {
-                    if refresh_interval < 10 {
+                    if refresh_interval_us < 10000 {
                         navigator_rs::ADCData { channel: [0.0; 4] }
                     } else {
                         lock.navigator.read_adc_all()
@@ -122,13 +121,11 @@ impl NavigationManager {
         log::info!("Datalogger started");
 
         loop {
-            thread::sleep(std::time::Duration::from_micros(refresh_interval));
-
             let reading = DATA.read().unwrap().state;
 
             logger.log_data(&reading).expect("Failed to log data");
 
-            thread::sleep(std::time::Duration::from_millis(refresh_interval));
+            thread::sleep(std::time::Duration::from_micros(refresh_interval));
         }
     }
 
