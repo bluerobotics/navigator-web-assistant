@@ -1,121 +1,129 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <title>Navigator Assistant</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
 
-        h1 {
-            text-align: center;
-        }
+      h1 {
+        text-align: center;
+      }
 
-        fieldset {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 10px;
-        }
+      fieldset {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px;
+      }
 
-        legend {
-            font-weight: bold;
-        }
+      legend {
+        font-weight: bold;
+      }
 
-        table {
-            width: 100%;
-        }
+      table {
+        width: 100%;
+      }
 
-        th,
-        td {
-            width: 50%;
-            padding: 5px;
-            text-align: center;
-        }
+      th,
+      td {
+        width: 50%;
+        padding: 5px;
+        text-align: center;
+      }
 
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
-        }
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+      }
 
-        .flex-container {
-            display: flex;
-            justify-content: space-between;
-        }
+      .flex-container {
+        display: flex;
+        justify-content: space-between;
+      }
 
-        .column {
-            flex: 1;
-            margin: 10px;
-        }
+      .column {
+        flex: 1;
+        margin: 10px;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <h1>Navigator</h1>
     <fieldset>
-        <legend>Navigator's Peripherals</legend>
-        <table>
-            <td>
-                <fieldset>
-                    <legend>PWM</legend>
+      <legend>Navigator's Peripherals</legend>
+      <table>
+        <td>
+          <fieldset>
+            <legend>PWM</legend>
 
-                    <fieldset>
-                        <legend>Channels</legend>
-                        <div id="channel-container"></div>
-                    </fieldset>
+            <fieldset>
+              <legend>Channels</legend>
+              <div id="channel-container"></div>
+            </fieldset>
 
-                    <fieldset>
-                        <legend>Frequency</legend>
-                        <input type="range" id="frequency-slider" min="24" max="1526" step="1" value="200"
-                            oninput="updateFrequency(this.value)" />
-                        <span id="frequency-value">200 Hz</span>
-                    </fieldset>
+            <fieldset>
+              <legend>Frequency</legend>
+              <input
+                type="range"
+                id="frequency-slider"
+                min="24"
+                max="1526"
+                step="1"
+                value="200"
+                oninput="updateFrequency(this.value)"
+              />
+              <span id="frequency-value">200 Hz</span>
+            </fieldset>
 
-                    <fieldset>
-                        <legend>Enable</legend>
-                        <button id="toggle-pwm-enable">Toggle PWM Enable</button>
-                    </fieldset>
-                </fieldset>
-            </td>
+            <fieldset>
+              <legend>Enable</legend>
+              <button id="toggle-pwm-enable">Toggle PWM Enable</button>
+            </fieldset>
+          </fieldset>
+        </td>
 
-            <td>
-                <fieldset>
-                    <legend>Sensors</legend>
-                    <fieldset>
-                        <legend>Update Control</legend>
+        <td>
+          <fieldset>
+            <legend>Sensors</legend>
+            <fieldset>
+              <legend>Update Control</legend>
               <label for="update-interval">Update rate (Hz):</label>
               <input type="number" id="update-interval" value="1" />
               <button id="start-update">Start Update</button>
-                        <button id="stop-update" disabled>Stop Update</button>
-                    </fieldset>
-                    <fieldset>
-                        <legend>Last Update</legend>
-                        <span id="last-update-timestamp"></span>
-                    </fieldset>
-                    <fieldset>
-                        <legend>Readings</legend>
-                        <table>
-                            <tr>
-                                <th>Sensor Type</th>
-                                <th>Value</th>
-                                <th>Unit</th>
-                            </tr>
-                            <tbody id="sensor-table"></tbody>
-                        </table>
-                    </fieldset>
-                </fieldset>
-            </td>
-        </table>
+              <button id="stop-update" disabled>Stop Update</button>
+            </fieldset>
+            <fieldset>
+              <legend>Last Update</legend>
+              <span id="last-update-timestamp"></span>
+            </fieldset>
+            <fieldset>
+              <legend>Readings</legend>
+              <table>
+                <tr>
+                  <th>Sensor Type</th>
+                  <th>Value</th>
+                  <th>Unit</th>
+                </tr>
+                <tbody id="sensor-table"></tbody>
+              </table>
+            </fieldset>
+          </fieldset>
+        </td>
+      </table>
     </fieldset>
 
     <script>
-        const baseUrl = location.origin;
+      const baseUrl = location.origin;
 
+      let updateIntervalId;
+      let pwmEnabled = false;
 
       const wsBaseUrl = `ws://${location.host}/ws`; // WebSocket URL
       let ws; // WebSocket object
@@ -148,80 +156,80 @@
         }
       }
 
-        function updatePWM(slider) {
-            const channel = slider.name;
-            const dutyCycle = slider.value;
+      function updatePWM(slider) {
+        const channel = slider.name;
+        const dutyCycle = slider.value;
 
-            fetch(`${baseUrl}/v1/output/pwm/${channel}/${dutyCycle}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-                .then((response) => {
-                    if (response.status === 200) {
-                        console.log(`PWM for ${channel} updated successfully.`);
-                    } else {
-                        console.error(`Failed to update PWM for ${channel}.`);
-                    }
-                })
-                .catch((error) => {
-                    console.error(`Error updating PWM for ${channel}: ${error}`);
-                });
-        }
+        fetch(`${baseUrl}/v1/output/pwm/${channel}/${dutyCycle}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (response.status === 200) {
+              console.log(`PWM for ${channel} updated successfully.`);
+            } else {
+              console.error(`Failed to update PWM for ${channel}.`);
+            }
+          })
+          .catch((error) => {
+            console.error(`Error updating PWM for ${channel}: ${error}`);
+          });
+      }
 
-        function updateFrequency(value) {
-            const frequencyValue = parseFloat(value).toFixed(1);
+      function updateFrequency(value) {
+        const frequencyValue = parseFloat(value).toFixed(1);
 
-            document.getElementById(
-                "frequency-value"
-            ).textContent = `${frequencyValue} Hz`;
+        document.getElementById(
+          "frequency-value"
+        ).textContent = `${frequencyValue} Hz`;
 
-            fetch(`${baseUrl}/v1/output/pwm/frequency/${frequencyValue}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-                .then((response) => {
-                    if (response.status === 200) {
-                        console.log(`PWM frequency set to ${frequencyValue} Hz.`);
-                    } else {
-                        console.error(
-                            `Failed to set PWM frequency to ${frequencyValue} Hz.`
-                        );
-                    }
-                })
-                .catch((error) => {
-                    console.error(`Error setting PWM frequency: ${error}`);
-                });
-        }
+        fetch(`${baseUrl}/v1/output/pwm/frequency/${frequencyValue}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (response.status === 200) {
+              console.log(`PWM frequency set to ${frequencyValue} Hz.`);
+            } else {
+              console.error(
+                `Failed to set PWM frequency to ${frequencyValue} Hz.`
+              );
+            }
+          })
+          .catch((error) => {
+            console.error(`Error setting PWM frequency: ${error}`);
+          });
+      }
 
-        function togglePWMEnable() {
-            pwmEnabled = !pwmEnabled;
-            const enableValue = pwmEnabled ? "true" : "false";
+      function togglePWMEnable() {
+        pwmEnabled = !pwmEnabled;
+        const enableValue = pwmEnabled ? "true" : "false";
 
-            fetch(`${baseUrl}/v1/output/pwm/enable/${enableValue}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-                .then((response) => {
-                    if (response.status === 200) {
-                        console.log(
-                            `PWM ${pwmEnabled ? "enabled" : "disabled"} successfully.`
-                        );
-                    } else {
-                        console.error(
-                            `Failed to ${pwmEnabled ? "enable" : "disable"} PWM.`
-                        );
-                    }
-                })
-                .catch((error) => {
-                    console.error(`Error toggling PWM: ${error}`);
-                });
-        }
+        fetch(`${baseUrl}/v1/output/pwm/enable/${enableValue}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (response.status === 200) {
+              console.log(
+                `PWM ${pwmEnabled ? "enabled" : "disabled"} successfully.`
+              );
+            } else {
+              console.error(
+                `Failed to ${pwmEnabled ? "enable" : "disable"} PWM.`
+              );
+            }
+          })
+          .catch((error) => {
+            console.error(`Error toggling PWM: ${error}`);
+          });
+      }
 
       function updateSensorReadings() {
         const sensorTable = document.getElementById("sensor-table");
@@ -272,48 +280,47 @@
         document.getElementById("stop-update").disabled = false;
       }
 
-        function stopUpdate() {
-            clearInterval(updateIntervalId);
-            document.getElementById("start-update").disabled = false;
-            document.getElementById("stop-update").disabled = true;
-        }
+      function stopUpdate() {
+        clearInterval(updateIntervalId);
+        document.getElementById("start-update").disabled = false;
+        document.getElementById("stop-update").disabled = true;
+      }
 
-        window.addEventListener("load", startUpdate);
+      window.addEventListener("load", startUpdate);
 
-        document
-            .getElementById("start-update")
-            .addEventListener("click", startUpdate);
-        document
-            .getElementById("stop-update")
-            .addEventListener("click", stopUpdate);
-        document
-            .getElementById("toggle-pwm-enable")
-            .addEventListener("click", togglePWMEnable);
+      document
+        .getElementById("start-update")
+        .addEventListener("click", startUpdate);
+      document
+        .getElementById("stop-update")
+        .addEventListener("click", stopUpdate);
+      document
+        .getElementById("toggle-pwm-enable")
+        .addEventListener("click", togglePWMEnable);
 
-        const channelContainer = document.getElementById("channel-container");
+      const channelContainer = document.getElementById("channel-container");
 
-        for (let i = 1; i <= 16; i++) {
-            const label = document.createElement("label");
-            label.setAttribute("for", `ch${i}`);
-            label.textContent = `Channel ${i}:`;
+      for (let i = 1; i <= 16; i++) {
+        const label = document.createElement("label");
+        label.setAttribute("for", `ch${i}`);
+        label.textContent = `Channel ${i}:`;
 
-            const input = document.createElement("input");
-            input.setAttribute("type", "range");
-            input.setAttribute("id", `ch${i}`);
-            input.setAttribute("name", `ch${i}`);
-            input.setAttribute("min", "0");
-            input.setAttribute("max", "4095");
-            input.setAttribute("value", "2048");
-            input.setAttribute("oninput", "updatePWM(this)");
+        const input = document.createElement("input");
+        input.setAttribute("type", "range");
+        input.setAttribute("id", `ch${i}`);
+        input.setAttribute("name", `ch${i}`);
+        input.setAttribute("min", "0");
+        input.setAttribute("max", "4095");
+        input.setAttribute("value", "2048");
+        input.setAttribute("oninput", "updatePWM(this)");
 
-            const br = document.createElement("br");
+        const br = document.createElement("br");
 
-            channelContainer.appendChild(label);
-            channelContainer.appendChild(input);
-            channelContainer.appendChild(br);
-        }
+        channelContainer.appendChild(label);
+        channelContainer.appendChild(input);
+        channelContainer.appendChild(br);
+      }
     </script>
-</body>
-
+  </body>
 </html>
 <!DOCTYPE html>
