@@ -160,22 +160,23 @@
         const channel = slider.name;
         const dutyCycle = slider.value;
 
-        fetch(`${baseUrl}/v1/output/pwm/${channel}/${dutyCycle}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => {
-            if (response.status === 200) {
-              console.log(`PWM for ${channel} updated successfully.`);
-            } else {
-              console.error(`Failed to update PWM for ${channel}.`);
-            }
-          })
-          .catch((error) => {
-            console.error(`Error updating PWM for ${channel}: ${error}`);
-          });
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            // Prepare the message
+            const message = "/output/pwm/" + channel + "/" + dutyCycle;
+            // Send the message
+            ws.send(message);
+
+            // Log that the message has been sent
+            console.log("WebSocket message sent:", message);
+          } catch (error) {
+            console.error("Error sending WebSocket message:", error);
+          }
+        } else {
+          console.warn(
+            "WebSocket connection is not open. Unable to send message."
+          );
+        }
       }
 
       function updateFrequency(value) {
@@ -185,50 +186,45 @@
           "frequency-value"
         ).textContent = `${frequencyValue} Hz`;
 
-        fetch(`${baseUrl}/v1/output/pwm/frequency/${frequencyValue}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => {
-            if (response.status === 200) {
-              console.log(`PWM frequency set to ${frequencyValue} Hz.`);
-            } else {
-              console.error(
-                `Failed to set PWM frequency to ${frequencyValue} Hz.`
-              );
-            }
-          })
-          .catch((error) => {
-            console.error(`Error setting PWM frequency: ${error}`);
-          });
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            // Prepare the message
+            const message = "/output/pwm/frequency/" + frequencyValue;
+            // Send the message
+            ws.send(message);
+
+            // Log that the message has been sent
+            console.log("WebSocket message sent:", message);
+          } catch (error) {
+            console.error("Error sending WebSocket message:", error);
+          }
+        } else {
+          console.warn(
+            "WebSocket connection is not open. Unable to send message."
+          );
+        }
       }
 
       function togglePWMEnable() {
         pwmEnabled = !pwmEnabled;
         const enableValue = pwmEnabled ? "true" : "false";
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            // Prepare the message
+            const message = "/output/pwm/enable/" + enableValue;
+            // Send the message
+            ws.send(message);
 
-        fetch(`${baseUrl}/v1/output/pwm/enable/${enableValue}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => {
-            if (response.status === 200) {
-              console.log(
-                `PWM ${pwmEnabled ? "enabled" : "disabled"} successfully.`
-              );
-            } else {
-              console.error(
-                `Failed to ${pwmEnabled ? "enable" : "disable"} PWM.`
-              );
-            }
-          })
-          .catch((error) => {
-            console.error(`Error toggling PWM: ${error}`);
-          });
+            // Log that the message has been sent
+            console.log("WebSocket message sent:", message);
+          } catch (error) {
+            console.error("Error sending WebSocket message:", error);
+          }
+        } else {
+          console.warn(
+            "WebSocket connection is not open. Unable to send message."
+          );
+        }
       }
 
       function updateSensorReadings() {
