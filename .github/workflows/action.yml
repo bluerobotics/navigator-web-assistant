@@ -79,5 +79,14 @@ jobs:
        chmod +x ./dist/armv7-unknown-linux-gnueabihf/navigator-assistant
        ./dist/armv7-unknown-linux-gnueabihf/navigator-assistant > navigator.log 2>&1 &
        PID=$!
+
        sleep 10
+
+       if ps -p $PID > /dev/null; then
+        echo "navigator-assistant started successfully with PID $PID."
+       else
+        echo "Error: navigator-assistant failed to start."
+        exit 1
+       fi
+
        kill $PID
