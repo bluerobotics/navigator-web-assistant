@@ -223,56 +223,44 @@
                 });
         }
 
-        function updateSensorReadings() {
-            fetch(`${baseUrl}/v1/input/all/cached`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    const sensorTable = document.getElementById("sensor-table");
-                    sensorTable.innerHTML = ""; // Clear previous readings
+      function updateSensorReadings() {
+        const sensorTable = document.getElementById("sensor-table");
+        sensorTable.innerHTML = ""; // Clear previous readings
 
-                    data.input.forEach((input) => {
-                        const row = sensorTable.insertRow();
-                        const sensorTypeCell = row.insertCell(0);
-                        const valueCell = row.insertCell(1);
-                        const unitCell = row.insertCell(2);
+        ws_inputs.input.forEach((input) => {
+          const row = sensorTable.insertRow();
+          const sensorTypeCell = row.insertCell(0);
+          const valueCell = row.insertCell(1);
+          const unitCell = row.insertCell(2);
 
-                        sensorTypeCell.textContent = input.type;
-                        unitCell.textContent = input.unit;
-                        if (Array.isArray(input.value)) {
-                            const roundedValues = input.value.map(val => val.toFixed(2));
-                            valueCell.textContent = roundedValues.join(", ");
+          sensorTypeCell.textContent = input.type;
+          unitCell.textContent = input.unit;
+          if (Array.isArray(input.value)) {
+            const roundedValues = input.value.map((val) => val.toFixed(2));
+            valueCell.textContent = roundedValues.join(", ");
+          } else {
+            valueCell.textContent = input.value.toFixed(2);
+          }
+        });
 
-                        } else {
-                            valueCell.textContent = input.value.toFixed(2);
-                        }
+        const lastUpdateTimestamp = document.getElementById(
+          "last-update-timestamp"
+        );
+        const timestamp = new Date(ws_inputs.timestamp);
 
-                        const lastUpdateTimestamp = document.getElementById("last-update-timestamp");
-                        const timestamp = new Date(data.timestamp);
+        const day = timestamp.getDate();
+        const month = timestamp.getMonth() + 1; // Month is zero-based
+        const year = timestamp.getFullYear();
+        const hour = timestamp.getHours();
+        const minute = timestamp.getMinutes();
+        const second = timestamp.getSeconds();
+        const milisecond = timestamp.getMilliseconds();
 
-                        const day = timestamp.getDate();
-                        const month = timestamp.getMonth() + 1; // Month is zero-based
-                        const year = timestamp.getFullYear();
-                        const hour = timestamp.getHours();
-                        const minute = timestamp.getMinutes();
-                        const second = timestamp.getSeconds();
-                        const milisecond = timestamp.getMilliseconds();
-
-                        lastUpdateTimestamp.innerHTML = `
+        lastUpdateTimestamp.innerHTML = `
                             Date: ${day}/${month}/${year}<br>
                             Time: ${hour}:${minute}:${second}.${milisecond}
                         `;
-
-                    });
-                })
-                .catch((error) => {
-                    console.error("Error fetching sensor data:", error);
-                });
-        }
+      }
 
         function startUpdate() {
             const interval = parseInt(
