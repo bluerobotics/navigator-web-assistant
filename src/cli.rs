@@ -90,6 +90,9 @@ fn hz_to_us(rate_hz: f64) -> u64 {
     if rate_hz == 0.0 {
         return 0;
     };
+    if rate_hz > 200.0 {
+        panic!("Error: Invalid rate used on inputs")
+    };
     let us_per_second = 1_000_000.0;
     (us_per_second / rate_hz) as u64
 }
