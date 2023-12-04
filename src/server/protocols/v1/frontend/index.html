@@ -142,6 +142,28 @@
             // Handle incoming WebSocket messages here
             const data = JSON.parse(event.data);
 
+            if (data.model == "Navigator_v4" && data.output !== undefined) {
+              data.output.forEach((output) => {
+                if (
+                  output.PWM !== undefined &&
+                  Array.isArray(output.PWM.channel) &&
+                  Array.isArray(output.PWM.value)
+                ) {
+                  output.PWM.channel.forEach((channel, index) => {
+                    const chInput = document.getElementById(channel);
+                    chInput.value = output.PWM.value[index];
+                  });
+                }
+                if (
+                  output.PWM !== undefined &&
+                  output.PWM.frequency !== undefined
+                ) {
+                  document.getElementById("frequency-slider").value =
+                    output.PWM.frequency;
+                }
+              });
+            }
+
             if (data.model == "Navigator_v4" && data.input !== undefined) {
               ws_inputs = data;
             }
@@ -160,22 +182,23 @@
         const channel = slider.name;
         const dutyCycle = slider.value;
 
-        fetch(`${baseUrl}/v1/output/pwm/${channel}/${dutyCycle}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => {
-            if (response.status === 200) {
-              console.log(`PWM for ${channel} updated successfully.`);
-            } else {
-              console.error(`Failed to update PWM for ${channel}.`);
-            }
-          })
-          .catch((error) => {
-            console.error(`Error updating PWM for ${channel}: ${error}`);
-          });
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            // Prepare the message
+            const message = "/output/pwm/" + channel + "/" + dutyCycle;
+            // Send the message
+            ws.send(message);
+
+            // Log that the message has been sent
+            console.log("WebSocket message sent:", message);
+          } catch (error) {
+            console.error("Error sending WebSocket message:", error);
+          }
+        } else {
+          console.warn(
+            "WebSocket connection is not open. Unable to send message."
+          );
+        }
       }
 
       function updateFrequency(value) {
@@ -185,50 +208,45 @@
           "frequency-value"
         ).textContent = `${frequencyValue} Hz`;
 
-        fetch(`${baseUrl}/v1/output/pwm/frequency/${frequencyValue}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => {
-            if (response.status === 200) {
-              console.log(`PWM frequency set to ${frequencyValue} Hz.`);
-            } else {
-              console.error(
-                `Failed to set PWM frequency to ${frequencyValue} Hz.`
-              );
-            }
-          })
-          .catch((error) => {
-            console.error(`Error setting PWM frequency: ${error}`);
-          });
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            // Prepare the message
+            const message = "/output/pwm/frequency/" + frequencyValue;
+            // Send the message
+            ws.send(message);
+
+            // Log that the message has been sent
+            console.log("WebSocket message sent:", message);
+          } catch (error) {
+            console.error("Error sending WebSocket message:", error);
+          }
+        } else {
+          console.warn(
+            "WebSocket connection is not open. Unable to send message."
+          );
+        }
       }
 
       function togglePWMEnable() {
         pwmEnabled = !pwmEnabled;
         const enableValue = pwmEnabled ? "true" : "false";
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            // Prepare the message
+            const message = "/output/pwm/enable/" + enableValue;
+            // Send the message
+            ws.send(message);
 
-        fetch(`${baseUrl}/v1/output/pwm/enable/${enableValue}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => {
-            if (response.status === 200) {
-              console.log(
-                `PWM ${pwmEnabled ? "enabled" : "disabled"} successfully.`
-              );
-            } else {
-              console.error(
-                `Failed to ${pwmEnabled ? "enable" : "disable"} PWM.`
-              );
-            }
-          })
-          .catch((error) => {
-            console.error(`Error toggling PWM: ${error}`);
-          });
+            // Log that the message has been sent
+            console.log("WebSocket message sent:", message);
+          } catch (error) {
+            console.error("Error sending WebSocket message:", error);
+          }
+        } else {
+          console.warn(
+            "WebSocket connection is not open. Unable to send message."
+          );
+        }
       }
 
       function updateSensorReadings() {
@@ -302,13 +320,13 @@
 
       for (let i = 1; i <= 16; i++) {
         const label = document.createElement("label");
-        label.setAttribute("for", `ch${i}`);
+        label.setAttribute("for", `Ch${i}`);
         label.textContent = `Channel ${i}:`;
 
         const input = document.createElement("input");
         input.setAttribute("type", "range");
-        input.setAttribute("id", `ch${i}`);
-        input.setAttribute("name", `ch${i}`);
+        input.setAttribute("id", `Ch${i}`);
+        input.setAttribute("name", `Ch${i}`);
         input.setAttribute("min", "0");
         input.setAttribute("max", "4095");
         input.setAttribute("value", "2048");
