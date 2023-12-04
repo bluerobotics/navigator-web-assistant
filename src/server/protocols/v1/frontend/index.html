@@ -116,8 +116,37 @@
     <script>
         const baseUrl = location.origin;
 
-        let updateIntervalId;
-        let pwmEnabled = false;
+
+      const wsBaseUrl = `ws://${location.host}/ws`; // WebSocket URL
+      let ws; // WebSocket object
+      let ws_inputs;
+      initWebSocket();
+
+      function initWebSocket() {
+        try {
+          ws = new WebSocket(wsBaseUrl);
+
+          ws.onopen = function () {
+            console.log("WebSocket connection opened.");
+          };
+
+          ws.onmessage = function (event) {
+            // Handle incoming WebSocket messages here
+            const data = JSON.parse(event.data);
+
+            if (data.model == "Navigator_v4" && data.input !== undefined) {
+              ws_inputs = data;
+            }
+          };
+
+          ws.onclose = function () {
+            console.log("WebSocket connection closed.");
+            // You may want to handle reconnection logic here
+          };
+        } catch (error) {
+          console.error("Error initializing WebSocket:", error);
+        }
+      }
 
         function updatePWM(slider) {
             const channel = slider.name;
