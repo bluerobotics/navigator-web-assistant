@@ -62,16 +62,6 @@ async fn index() -> impl Responder {
     handle_embedded_file("index.html")
 }
 #[api_v2_operation]
-#[get("/dist/{_:.*}")]
-async fn dist(path: web::Path<String>) -> impl Responder {
-    handle_embedded_file(path.as_str())
-}
-#[api_v2_operation]
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
-#[api_v2_operation]
 #[get("v1/settings/init")]
 async fn init() -> Result<Json<AnsPackage>, Error> {
     let package = packages::init();
@@ -156,8 +146,6 @@ async fn get_server_metadata() -> Result<Json<ServerMetadata>, Error> {
 
 pub fn register_services(cfg: &mut web::ServiceConfig) {
     cfg.service(index)
-        .service(dist)
-        .service(echo)
         .service(get_sensor)
         .service(get_sensor_cached)
         .service(get_led)
