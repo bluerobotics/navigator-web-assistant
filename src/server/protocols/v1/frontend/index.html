@@ -262,16 +262,15 @@
                         `;
       }
 
-        function startUpdate() {
-            const interval = parseInt(
-                document.getElementById("update-interval").value,
-                10
-            );
-            updateSensorReadings(); // Initial update
-            updateIntervalId = setInterval(updateSensorReadings, interval);
-            document.getElementById("start-update").disabled = true;
-            document.getElementById("stop-update").disabled = false;
-        }
+      function startUpdate() {
+        const rate = parseFloat(
+          document.getElementById("update-interval").value,
+          10
+        );
+        updateIntervalId = setInterval(updateSensorReadings, 1000 / rate);
+        document.getElementById("start-update").disabled = true;
+        document.getElementById("stop-update").disabled = false;
+      }
 
         function stopUpdate() {
             clearInterval(updateIntervalId);
