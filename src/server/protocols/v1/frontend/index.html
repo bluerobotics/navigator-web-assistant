@@ -142,6 +142,20 @@
             // Handle incoming WebSocket messages here
             const data = JSON.parse(event.data);
 
+            if (data.model == "Navigator_v4" && data.output !== undefined) {
+              data.output.forEach((output) => {
+                if (
+                  output.PWM !== undefined &&
+                  Array.isArray(output.PWM.channel) &&
+                  Array.isArray(output.PWM.value)
+                ) {
+                  output.PWM.channel.forEach((channel, index) => {
+                    const chInput = document.getElementById(channel);
+                    chInput.value = output.PWM.value[index];
+                  });
+                }
+            }
+
             if (data.model == "Navigator_v4" && data.input !== undefined) {
               ws_inputs = data;
             }
