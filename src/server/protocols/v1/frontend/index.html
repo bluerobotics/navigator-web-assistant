@@ -154,6 +154,14 @@
                     chInput.value = output.PWM.value[index];
                   });
                 }
+                if (
+                  output.PWM !== undefined &&
+                  output.PWM.frequency !== undefined
+                ) {
+                  document.getElementById("frequency-slider").value =
+                    output.PWM.frequency;
+                }
+              });
             }
 
             if (data.model == "Navigator_v4" && data.input !== undefined) {
