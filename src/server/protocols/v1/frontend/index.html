@@ -320,13 +320,13 @@
 
       for (let i = 1; i <= 16; i++) {
         const label = document.createElement("label");
-        label.setAttribute("for", `ch${i}`);
+        label.setAttribute("for", `Ch${i}`);
         label.textContent = `Channel ${i}:`;
 
         const input = document.createElement("input");
         input.setAttribute("type", "range");
-        input.setAttribute("id", `ch${i}`);
-        input.setAttribute("name", `ch${i}`);
+        input.setAttribute("id", `Ch${i}`);
+        input.setAttribute("name", `Ch${i}`);
         input.setAttribute("min", "0");
         input.setAttribute("max", "4095");
         input.setAttribute("value", "2048");
