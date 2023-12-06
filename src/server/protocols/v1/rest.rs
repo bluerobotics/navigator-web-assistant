@@ -56,7 +56,7 @@ fn handle_embedded_file(path: &str) -> HttpResponse {
         None => HttpResponse::NotFound().body("404 Not Found"),
     }
 }
-#[api_v2_operation]
+#[api_v2_operation(skip)]
 #[get("/")]
 async fn index() -> impl Responder {
     handle_embedded_file("index.html")
@@ -83,6 +83,12 @@ async fn get_sensor_cached(sensor: web::Path<String>) -> Result<Json<AnsPackage>
         packages::Sensors::from_str(&sensor.into_inner()).unwrap(),
         true,
     );
+    Ok(Json(package))
+}
+#[api_v2_operation]
+#[get("v1/output/user_led/")]
+async fn get_led_all() -> Result<Json<AnsPackage>, Error> {
+    let package = packages::get_led_all();
     Ok(Json(package))
 }
 #[api_v2_operation]
@@ -113,10 +119,7 @@ async fn post_neopixel(json: web::Json<ApiNeopixel>) -> Result<Json<AnsPackage>,
 #[post("v1/output/pwm/channel/value")]
 async fn post_pwm(json: web::Json<ApiPwmChannelValue>) -> Result<Json<AnsPackage>, Error> {
     let pwm = json.into_inner();
-    let package = packages::pwm_channel_value(
-        hardware_manager::PwmChannel::from_str(pwm.channel.as_str()).unwrap(),
-        pwm.value,
-    );
+    let package = packages::pwm_channel_value(pwm.channel, pwm.value);
     Ok(Json(package))
 }
 #[api_v2_operation]
@@ -149,6 +152,7 @@ pub fn register_services(cfg: &mut web::ServiceConfig) {
         .service(get_sensor)
         .service(get_sensor_cached)
         .service(get_led)
+        .service(get_led_all)
         .service(get_server_metadata)
         .service(post_pwm_enable)
         .service(post_pwm_frequency)
