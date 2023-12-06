@@ -86,6 +86,12 @@ async fn get_sensor_cached(sensor: web::Path<String>) -> Result<Json<AnsPackage>
     Ok(Json(package))
 }
 #[api_v2_operation]
+#[get("v1/output/user_led/")]
+async fn get_led_all() -> Result<Json<AnsPackage>, Error> {
+    let package = packages::get_led_all();
+    Ok(Json(package))
+}
+#[api_v2_operation]
 #[get("v1/output/user_led/{userled}")]
 async fn get_led(userled: web::Path<String>) -> Result<Json<AnsPackage>, Error> {
     let package =
@@ -149,6 +155,7 @@ pub fn register_services(cfg: &mut web::ServiceConfig) {
         .service(get_sensor)
         .service(get_sensor_cached)
         .service(get_led)
+        .service(get_led_all)
         .service(get_server_metadata)
         .service(post_pwm_enable)
         .service(post_pwm_frequency)
