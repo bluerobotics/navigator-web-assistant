@@ -1,3 +1,5 @@
+use strum::IntoEnumIterator;
+
 use crate::{
     hardware_manager::{self},
     server::protocols::v1::structures::{
@@ -148,6 +150,23 @@ pub fn get_led(select: hardware_manager::UserLed) -> AnsPackage {
         channel: (vec![select]),
         value: (vec![state]),
     };
+    AnsPackage::new(Operation::Output(OutputRequest {
+        timestamp: (chrono::Utc::now().to_string()),
+        output: vec![OutputDevices::UserLED(user_led)],
+    }))
+}
+
+pub fn get_led_all() -> AnsPackage {
+    let mut user_led = UserLED {
+        channel: (vec![]),
+        value: (vec![]),
+    };
+
+    for select in hardware_manager::UserLed::iter() {
+        user_led.channel.push(select.clone());
+        user_led.value.push(hardware_manager::get_led(select));
+    }
+
     AnsPackage::new(Operation::Output(OutputRequest {
         timestamp: (chrono::Utc::now().to_string()),
         output: vec![OutputDevices::UserLED(user_led)],
