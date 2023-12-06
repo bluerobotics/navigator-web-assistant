@@ -6,6 +6,7 @@ use std::convert::From;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, RwLock};
 use std::thread;
+use strum_macros::EnumIter;
 
 #[derive(Default)]
 struct NavigationManager {
@@ -202,7 +203,7 @@ pub enum PwmChannel {
     Ch16,
     All,
 }
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, EnumIter)]
 pub enum UserLed {
     Led1,
     Led2,
