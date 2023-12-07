@@ -92,13 +92,6 @@ async fn get_led_all() -> Result<Json<AnsPackage>, Error> {
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[get("v1/output/user_led/{userled}")]
-async fn get_led(userled: web::Path<String>) -> Result<Json<AnsPackage>, Error> {
-    let package =
-        packages::get_led(hardware_manager::UserLed::from_str(&userled.into_inner()).unwrap());
-    Ok(Json(package))
-}
-#[api_v2_operation]
 #[post("v1/output/user_led")]
 async fn post_led(json: web::Json<ApiUserLed>) -> Result<Json<AnsPackage>, Error> {
     let userled = json.into_inner();
@@ -151,7 +144,6 @@ pub fn register_services(cfg: &mut web::ServiceConfig) {
     cfg.service(index)
         .service(get_sensor)
         .service(get_sensor_cached)
-        .service(get_led)
         .service(get_led_all)
         .service(get_server_metadata)
         .service(post_pwm_enable)
