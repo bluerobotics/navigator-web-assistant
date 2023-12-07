@@ -56,7 +56,7 @@ fn handle_embedded_file(path: &str) -> HttpResponse {
         None => HttpResponse::NotFound().body("404 Not Found"),
     }
 }
-#[api_v2_operation]
+#[api_v2_operation(skip)]
 #[get("/")]
 async fn index() -> impl Responder {
     handle_embedded_file("index.html")
