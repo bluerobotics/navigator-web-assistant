@@ -86,7 +86,7 @@ async fn get_sensor_cached(sensor: web::Path<String>) -> Result<Json<AnsPackage>
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[get("v1/output/user_led/")]
+#[get("v1/output/user_led")]
 async fn get_led_all() -> Result<Json<AnsPackage>, Error> {
     let package = packages::get_led_all();
     Ok(Json(package))
@@ -99,7 +99,7 @@ async fn get_led(userled: web::Path<String>) -> Result<Json<AnsPackage>, Error> 
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[post("v1/output/user_led/")]
+#[post("v1/output/user_led")]
 async fn post_led(json: web::Json<ApiUserLed>) -> Result<Json<AnsPackage>, Error> {
     let userled = json.into_inner();
     let package = packages::set_led(
@@ -109,7 +109,7 @@ async fn post_led(json: web::Json<ApiUserLed>) -> Result<Json<AnsPackage>, Error
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[post("v1/output/neopixel/")]
+#[post("v1/output/neopixel")]
 async fn post_neopixel(json: web::Json<ApiNeopixel>) -> Result<Json<AnsPackage>, Error> {
     let neopixel = json.into_inner();
     let package = packages::set_neopixel(vec![[neopixel.red, neopixel.green, neopixel.blue]]);
@@ -123,7 +123,7 @@ async fn post_pwm(json: web::Json<ApiPwmChannelValue>) -> Result<Json<AnsPackage
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[post("v1/output/pwm/enable/")]
+#[post("v1/output/pwm/enable")]
 async fn post_pwm_enable(json: web::Json<ApiPwmEnable>) -> Result<Json<AnsPackage>, Error> {
     let bool = json.into_inner().enable;
     let package = packages::pwm_enable(bool);
@@ -131,7 +131,7 @@ async fn post_pwm_enable(json: web::Json<ApiPwmEnable>) -> Result<Json<AnsPackag
 }
 
 #[api_v2_operation]
-#[post("v1/output/pwm/frequency/")]
+#[post("v1/output/pwm/frequency")]
 async fn post_pwm_frequency(json: web::Json<ApiPwmFrequency>) -> Result<Json<AnsPackage>, Error> {
     let frequency = json.into_inner().frequency;
     let package = packages::set_pwm_freq_hz(frequency);
