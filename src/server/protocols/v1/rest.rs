@@ -33,7 +33,7 @@ pub struct ApiPwmEnable {
 
 #[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
 pub struct ApiPwmChannelValue {
-    channel: String,
+    channel: hardware_manager::PwmChannel,
     value: u16,
 }
 

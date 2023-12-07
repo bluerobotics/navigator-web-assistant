@@ -1,6 +1,7 @@
 use crate::data_logger::DataLogger;
 use crate::server::protocols::v1::packages;
 use lazy_static::lazy_static;
+use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use std::convert::From;
 use std::path::PathBuf;
@@ -183,7 +184,7 @@ impl From<navigator_rs::ADCData> for ADCData {
         }
     }
 }
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Apiv2Schema, Debug, Serialize, Deserialize, Clone)]
 pub enum PwmChannel {
     Ch1,
     Ch2,
