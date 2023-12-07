@@ -69,37 +69,26 @@ async fn init() -> Result<Json<AnsPackage>, Error> {
 }
 #[api_v2_operation]
 #[get("v1/input/{sensor}")]
-async fn get_sensor(sensor: web::Path<String>) -> Result<Json<AnsPackage>, Error> {
-    let package = packages::reading(
-        packages::Sensors::from_str(&sensor.into_inner()).unwrap(),
-        false,
-    );
+async fn get_sensor(sensor: web::Path<packages::Sensors>) -> Result<Json<AnsPackage>, Error> {
+    let package = packages::reading(sensor.into_inner(), false);
     Ok(Json(package))
 }
 #[api_v2_operation]
 #[get("v1/input/{sensor}/cached")]
-async fn get_sensor_cached(sensor: web::Path<String>) -> Result<Json<AnsPackage>, Error> {
-    let package = packages::reading(
-        packages::Sensors::from_str(&sensor.into_inner()).unwrap(),
-        true,
-    );
+async fn get_sensor_cached(
+    sensor: web::Path<packages::Sensors>,
+) -> Result<Json<AnsPackage>, Error> {
+    let package = packages::reading(sensor.into_inner(), true);
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[get("v1/output/user_led/")]
+#[get("v1/output/user_led")]
 async fn get_led_all() -> Result<Json<AnsPackage>, Error> {
     let package = packages::get_led_all();
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[get("v1/output/user_led/{userled}")]
-async fn get_led(userled: web::Path<String>) -> Result<Json<AnsPackage>, Error> {
-    let package =
-        packages::get_led(hardware_manager::UserLed::from_str(&userled.into_inner()).unwrap());
-    Ok(Json(package))
-}
-#[api_v2_operation]
-#[post("v1/output/user_led/")]
+#[post("v1/output/user_led")]
 async fn post_led(json: web::Json<ApiUserLed>) -> Result<Json<AnsPackage>, Error> {
     let userled = json.into_inner();
     let package = packages::set_led(
@@ -109,7 +98,7 @@ async fn post_led(json: web::Json<ApiUserLed>) -> Result<Json<AnsPackage>, Error
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[post("v1/output/neopixel/")]
+#[post("v1/output/neopixel")]
 async fn post_neopixel(json: web::Json<ApiNeopixel>) -> Result<Json<AnsPackage>, Error> {
     let neopixel = json.into_inner();
     let package = packages::set_neopixel(vec![[neopixel.red, neopixel.green, neopixel.blue]]);
@@ -123,7 +112,7 @@ async fn post_pwm(json: web::Json<ApiPwmChannelValue>) -> Result<Json<AnsPackage
     Ok(Json(package))
 }
 #[api_v2_operation]
-#[post("v1/output/pwm/enable/")]
+#[post("v1/output/pwm/enable")]
 async fn post_pwm_enable(json: web::Json<ApiPwmEnable>) -> Result<Json<AnsPackage>, Error> {
     let bool = json.into_inner().enable;
     let package = packages::pwm_enable(bool);
@@ -131,7 +120,7 @@ async fn post_pwm_enable(json: web::Json<ApiPwmEnable>) -> Result<Json<AnsPackag
 }
 
 #[api_v2_operation]
-#[post("v1/output/pwm/frequency/")]
+#[post("v1/output/pwm/frequency")]
 async fn post_pwm_frequency(json: web::Json<ApiPwmFrequency>) -> Result<Json<AnsPackage>, Error> {
     let frequency = json.into_inner().frequency;
     let package = packages::set_pwm_freq_hz(frequency);
@@ -151,7 +140,6 @@ pub fn register_services(cfg: &mut web::ServiceConfig) {
     cfg.service(index)
         .service(get_sensor)
         .service(get_sensor_cached)
-        .service(get_led)
         .service(get_led_all)
         .service(get_server_metadata)
         .service(post_pwm_enable)

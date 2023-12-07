@@ -1,3 +1,5 @@
+use paperclip::actix::Apiv2Schema;
+use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 
 use crate::{
@@ -9,6 +11,7 @@ use crate::{
 };
 use std::{error::Error, str::FromStr};
 
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
 pub enum Sensors {
     All,
     Temperature,
