@@ -119,10 +119,7 @@ async fn post_neopixel(json: web::Json<ApiNeopixel>) -> Result<Json<AnsPackage>,
 #[post("v1/output/pwm/channel/value")]
 async fn post_pwm(json: web::Json<ApiPwmChannelValue>) -> Result<Json<AnsPackage>, Error> {
     let pwm = json.into_inner();
-    let package = packages::pwm_channel_value(
-        hardware_manager::PwmChannel::from_str(pwm.channel.as_str()).unwrap(),
-        pwm.value,
-    );
+    let package = packages::pwm_channel_value(pwm.channel, pwm.value);
     Ok(Json(package))
 }
 #[api_v2_operation]
