@@ -13,7 +13,7 @@ use paperclip::actix::{
     Apiv2Schema,
 };
 use serde::{Deserialize, Serialize};
-use std::{str::FromStr, vec};
+use std::vec;
 
 #[derive(rust_embed::RustEmbed)]
 #[folder = "src/server/protocols/v1/frontend"]
