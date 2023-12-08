@@ -69,20 +69,16 @@ async fn init() -> Result<Json<AnsPackage>, Error> {
 }
 #[api_v2_operation]
 #[get("v1/input/{sensor}")]
-async fn get_sensor(sensor: web::Path<String>) -> Result<Json<AnsPackage>, Error> {
-    let package = packages::reading(
-        packages::Sensors::from_str(&sensor.into_inner()).unwrap(),
-        false,
-    );
+async fn get_sensor(sensor: web::Path<packages::Sensors>) -> Result<Json<AnsPackage>, Error> {
+    let package = packages::reading(sensor.into_inner(), false);
     Ok(Json(package))
 }
 #[api_v2_operation]
 #[get("v1/input/{sensor}/cached")]
-async fn get_sensor_cached(sensor: web::Path<String>) -> Result<Json<AnsPackage>, Error> {
-    let package = packages::reading(
-        packages::Sensors::from_str(&sensor.into_inner()).unwrap(),
-        true,
-    );
+async fn get_sensor_cached(
+    sensor: web::Path<packages::Sensors>,
+) -> Result<Json<AnsPackage>, Error> {
+    let package = packages::reading(sensor.into_inner(), true);
     Ok(Json(package))
 }
 #[api_v2_operation]
