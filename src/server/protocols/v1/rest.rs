@@ -1,5 +1,5 @@
 use crate::{
-    hardware_manager,
+    hardware_manager::{self, UserLed},
     server::protocols::v1::{
         packages,
         structures::{AnsPackage, ServerMetadata},
@@ -44,7 +44,7 @@ pub struct ApiPwmFrequency {
 
 #[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
 pub struct ApiUserLed {
-    userled: String,
+    userled: UserLed,
     value: bool,
 }
 
@@ -91,10 +91,7 @@ async fn get_led_all() -> Result<Json<AnsPackage>, Error> {
 #[post("v1/output/user_led")]
 async fn post_led(json: web::Json<ApiUserLed>) -> Result<Json<AnsPackage>, Error> {
     let userled = json.into_inner();
-    let package = packages::set_led(
-        hardware_manager::UserLed::from_str(userled.userled.as_str()).unwrap(),
-        userled.value,
-    );
+    let package = packages::set_led(userled.userled, userled.value);
     Ok(Json(package))
 }
 #[api_v2_operation]
