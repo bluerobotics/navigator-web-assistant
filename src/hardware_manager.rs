@@ -205,7 +205,7 @@ pub enum PwmChannel {
     Ch16,
     All,
 }
-#[derive(Debug, Serialize, Deserialize, Clone, EnumIter)]
+#[derive(Apiv2Schema, Debug, Serialize, Deserialize, Clone, EnumIter)]
 pub enum UserLed {
     Led1,
     Led2,
