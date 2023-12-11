@@ -96,8 +96,8 @@
               <legend>Update Control</legend>
               <label for="update-interval">Update rate (Hz):</label>
               <input type="number" id="update-interval" value="1" />
-              <button id="start-update">Start Update</button>
-              <button id="stop-update" disabled>Stop Update</button>
+              <input type="checkbox" id="update-service" checked />
+              <label for="start-update">Update enable.</label>
             </fieldset>
             <fieldset>
               <legend>Last Update</legend>
@@ -288,33 +288,46 @@
                         `;
       }
 
-      function startUpdate() {
-        const rate = parseFloat(
-          document.getElementById("update-interval").value,
-          10
-        );
-        updateIntervalId = setInterval(updateSensorReadings, 1000 / rate);
-        document.getElementById("start-update").disabled = true;
-        document.getElementById("stop-update").disabled = false;
+      function handleUpdateCheckboxChange() {
+        const updateCheckbox = document.getElementById("update-service");
+        const rateInput = document.getElementById("update-interval");
+
+        const rate = parseFloat(rateInput.value, 10);
+
+        if (rate <= 0 || rate === null || isNaN(rate)) {
+          alert(
+            "Warning: Can't set negative, zero or null value. Disabling update service."
+          );
+          updateCheckbox.checked = false;
+        }
+
+        if (rate > 200) {
+          alert(
+            "Warning: The sensors are read at a maximum rate of 200Hz. Setting update rate to 200Hz."
+          );
+          rateInput.value = 200;
+        }
+
+        if (updateCheckbox.checked) {
+          clearInterval(updateIntervalId);
+          updateIntervalId = setInterval(updateSensorReadings, 1000 / rate);
+        } else {
+          clearInterval(updateIntervalId);
+        }
       }
 
-      function stopUpdate() {
-        clearInterval(updateIntervalId);
-        document.getElementById("start-update").disabled = false;
-        document.getElementById("stop-update").disabled = true;
-      }
+      window.addEventListener("load", handleUpdateCheckboxChange);
 
-      window.addEventListener("load", startUpdate);
-
-      document
-        .getElementById("start-update")
-        .addEventListener("click", startUpdate);
-      document
-        .getElementById("stop-update")
-        .addEventListener("click", stopUpdate);
       document
         .getElementById("toggle-pwm-enable")
         .addEventListener("click", togglePWMEnable);
+      document
+        .getElementById("update-service")
+        .addEventListener("change", handleUpdateCheckboxChange);
+
+      document
+        .getElementById("update-interval")
+        .addEventListener("input", handleUpdateCheckboxChange);
 
       const channelContainer = document.getElementById("channel-container");
 
