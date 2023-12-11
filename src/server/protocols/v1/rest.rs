@@ -1,11 +1,12 @@
 use crate::{
     hardware_manager::{self, UserLed},
     server::protocols::v1::{
+        errors::Error,
         packages,
         structures::{AnsPackage, ServerMetadata},
     },
 };
-use actix_web::{Error, Responder};
+use actix_web::Responder;
 use mime_guess::from_path;
 use paperclip::actix::{
     api_v2_operation, get, post,
