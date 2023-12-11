@@ -277,10 +277,10 @@
         const day = timestamp.getDate();
         const month = timestamp.getMonth() + 1; // Month is zero-based
         const year = timestamp.getFullYear();
-        const hour = timestamp.getHours();
-        const minute = timestamp.getMinutes();
-        const second = timestamp.getSeconds();
-        const milisecond = timestamp.getMilliseconds();
+        const hour = timestamp.getHours().toString().padStart(2, '0');
+        const minute = timestamp.getMinutes().toString().padStart(2, '0');
+        const second = timestamp.getSeconds().toString().padStart(2, '0');
+        const milisecond = timestamp.getMilliseconds().toString().padStart(3, '0');
 
         lastUpdateTimestamp.innerHTML = `
                             Date: ${day}/${month}/${year}<br>
