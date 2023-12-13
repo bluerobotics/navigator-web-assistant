@@ -1,6 +1,7 @@
 use actix_web::{http::StatusCode, ResponseError};
 
 use paperclip::actix::api_v2_errors;
+use validator::ValidationErrors;
 
 #[allow(dead_code)]
 #[api_v2_errors(
@@ -23,5 +24,11 @@ impl ResponseError for Error {
             Self::BadRequest(_) => StatusCode::BAD_REQUEST,
             Self::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
+    }
+}
+
+impl From<ValidationErrors> for Error {
+    fn from(error: ValidationErrors) -> Self {
+        Self::BadRequest(error.to_string())
     }
 }
