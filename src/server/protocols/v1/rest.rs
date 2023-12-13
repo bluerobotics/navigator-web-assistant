@@ -128,10 +128,15 @@ async fn post_pwm_enable(json: web::Json<ApiPwmEnable>) -> Result<Json<AnsPackag
 #[api_v2_operation]
 #[post("v1/output/pwm/frequency")]
 async fn post_pwm_frequency(json: web::Json<ApiPwmFrequency>) -> Result<Json<AnsPackage>, Error> {
-    let frequency = json.into_inner().frequency;
-    let package = packages::set_pwm_freq_hz(frequency);
-    hardware_manager::pwm_enable(true);
-    Ok(Json(package))
+    let pwm = json.into_inner();
+    match pwm.validate() {
+        Ok(_) => {
+            let package = packages::set_pwm_freq_hz(pwm.frequency);
+            hardware_manager::pwm_enable(true);
+            Ok(Json(package))
+        }
+        Err(e) => Err(Error::from(e)),
+    }
 }
 
 /// The "register_service" route is used by BlueOS extensions manager
