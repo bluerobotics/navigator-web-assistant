@@ -15,6 +15,7 @@ use paperclip::actix::{
 };
 use serde::{Deserialize, Serialize};
 use std::vec;
+use validator::Validate;
 
 #[derive(rust_embed::RustEmbed)]
 #[folder = "src/server/protocols/v1/frontend"]
@@ -32,14 +33,16 @@ pub struct ApiPwmEnable {
     enable: bool,
 }
 
-#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize, Validate)]
 pub struct ApiPwmChannelValue {
     channel: hardware_manager::PwmChannel,
+    #[validate(range(min = 0, max = 4096))]
     value: u16,
 }
 
-#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize, Validate)]
 pub struct ApiPwmFrequency {
+    #[validate(range(min = 24, max = 1526))]
     frequency: f32,
 }
 
