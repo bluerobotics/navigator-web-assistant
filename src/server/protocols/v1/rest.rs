@@ -15,6 +15,7 @@ use paperclip::actix::{
 };
 use serde::{Deserialize, Serialize};
 use std::vec;
+use validator::Validate;
 
 #[derive(rust_embed::RustEmbed)]
 #[folder = "src/server/protocols/v1/frontend"]
@@ -32,14 +33,16 @@ pub struct ApiPwmEnable {
     enable: bool,
 }
 
-#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize, Validate)]
 pub struct ApiPwmChannelValue {
     channel: hardware_manager::PwmChannel,
+    #[validate(range(min = 0, max = 4096))]
     value: u16,
 }
 
-#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize, Validate)]
 pub struct ApiPwmFrequency {
+    #[validate(range(min = 24, max = 1526))]
     frequency: f32,
 }
 
@@ -106,8 +109,13 @@ async fn post_neopixel(json: web::Json<ApiNeopixel>) -> Result<Json<AnsPackage>,
 #[post("v1/output/pwm/channel/value")]
 async fn post_pwm(json: web::Json<ApiPwmChannelValue>) -> Result<Json<AnsPackage>, Error> {
     let pwm = json.into_inner();
-    let package = packages::pwm_channel_value(pwm.channel, pwm.value);
-    Ok(Json(package))
+    match pwm.validate() {
+        Ok(_) => {
+            let package = packages::pwm_channel_value(pwm.channel, pwm.value);
+            Ok(Json(package))
+        }
+        Err(e) => Err(Error::from(e)),
+    }
 }
 #[api_v2_operation]
 #[post("v1/output/pwm/enable")]
@@ -120,10 +128,15 @@ async fn post_pwm_enable(json: web::Json<ApiPwmEnable>) -> Result<Json<AnsPackag
 #[api_v2_operation]
 #[post("v1/output/pwm/frequency")]
 async fn post_pwm_frequency(json: web::Json<ApiPwmFrequency>) -> Result<Json<AnsPackage>, Error> {
-    let frequency = json.into_inner().frequency;
-    let package = packages::set_pwm_freq_hz(frequency);
-    hardware_manager::pwm_enable(true);
-    Ok(Json(package))
+    let pwm = json.into_inner();
+    match pwm.validate() {
+        Ok(_) => {
+            let package = packages::set_pwm_freq_hz(pwm.frequency);
+            hardware_manager::pwm_enable(true);
+            Ok(Json(package))
+        }
+        Err(e) => Err(Error::from(e)),
+    }
 }
 
 /// The "register_service" route is used by BlueOS extensions manager
