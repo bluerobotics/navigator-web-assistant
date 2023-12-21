@@ -57,7 +57,7 @@ jobs:
       run: |
         mkdir dist
         mkdir "dist/${{ matrix.TARGET }}"
-        mv $(find "./target" -type f -name "navigator-assistant") "dist/${{ matrix.TARGET }}"
+        mv $(find "./target" -type f -name "navigator-webassistant") "dist/${{ matrix.TARGET }}"
     - name: Upload bin
       uses: actions/upload-artifact@v3
       with:
@@ -76,16 +76,16 @@ jobs:
       path: dist
    - name: Run in background
      run: |
-       chmod +x ./dist/armv7-unknown-linux-gnueabihf/navigator-assistant
-       ./dist/armv7-unknown-linux-gnueabihf/navigator-assistant > navigator.log 2>&1 &
+       chmod +x ./dist/armv7-unknown-linux-gnueabihf/navigator-webassistant
+       ./dist/armv7-unknown-linux-gnueabihf/navigator-webassistant > navigator.log 2>&1 &
        PID=$!
 
        sleep 10
 
        if ps -p $PID > /dev/null; then
-        echo "navigator-assistant started successfully with PID $PID."
+        echo "navigator-webassistant started successfully with PID $PID."
        else
-        echo "Error: navigator-assistant failed to start."
+        echo "Error: navigator-webassistant failed to start."
         exit 1
        fi
 
