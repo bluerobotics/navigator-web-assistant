@@ -238,7 +238,8 @@
         if (ws.readyState === WebSocket.OPEN) {
           try {
             // Prepare the message
-            const message = "/output/pwm/" + channel + "/" + dutyCycle;
+            const message = `/output/pwm/channel/value/{ "channel": "${channel}", "value": ${dutyCycle} }`;
+
             // Send the message
             ws.send(message);
 
@@ -264,7 +265,7 @@
         if (ws.readyState === WebSocket.OPEN) {
           try {
             // Prepare the message
-            const message = "/output/pwm/frequency/" + frequencyValue;
+            const message = `/output/pwm/frequency/{ "frequency": ${frequencyValue} }`;
             // Send the message
             ws.send(message);
 
@@ -286,7 +287,8 @@
         if (ws.readyState === WebSocket.OPEN) {
           try {
             // Prepare the message
-            const message = "/output/pwm/enable/" + enableValue;
+            const message = `/output/pwm/enable/{ "enable": ${enableValue} }`;
+
             // Send the message
             ws.send(message);
 

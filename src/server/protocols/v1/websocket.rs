@@ -1,6 +1,8 @@
-use crate::{
-    hardware_manager,
-    server::protocols::v1::{packages, structures::AnsPackage},
+use crate::server::protocols::v1::{
+    packages,
+    structures::{
+        AnsPackage, ApiNeopixel, ApiPwmChannelValue, ApiPwmEnable, ApiPwmFrequency, ApiUserLed,
+    },
 };
 use actix::{Actor, Addr, AsyncContext, Handler, Message, StreamHandler};
 use actix_web::HttpRequest;
@@ -177,29 +179,38 @@ fn request_endpoint(request: &str) -> String {
         "output" => match v[1] {
             "userled" => {
                 if v.len() == 3 {
-                    let _package =
-                        packages::get_led(hardware_manager::UserLed::from_str(v[2]).unwrap());
+                    let _package = packages::get_led_all();
                     json!("Ok: Command received").to_string()
                 } else if v.len() == 4 {
-                    let state: bool = v[3].parse::<bool>().unwrap();
-                    let _package = packages::set_led(
-                        hardware_manager::UserLed::from_str(v[2]).unwrap(),
-                        state,
-                    );
-                    json!("Ok: Command received").to_string()
+                    match serde_json::from_str::<ApiUserLed>(v[2]) {
+                        Ok(data) => {
+                            let _package = packages::set_led(data.userled, data.value);
+                            json!("Ok: Command received").to_string()
+                        }
+                        Err(err) => json!(format!(
+                            "Error: JSON was not well-formatted. Details: {}",
+                            err
+                        ))
+                        .to_string(),
+                    }
                 } else {
                     json!("Error: Invalid command selected").to_string()
                 }
             }
             "neopixel" => {
-                if v.len() == 5 {
-                    let (red, green, blue) = (
-                        v[2].parse::<u8>().unwrap(),
-                        v[3].parse::<u8>().unwrap(),
-                        v[4].parse::<u8>().unwrap(),
-                    );
-                    let _package = packages::set_neopixel(vec![[red, green, blue]]);
-                    json!("Ok: Command received").to_string()
+                if v.len() == 3 {
+                    match serde_json::from_str::<ApiNeopixel>(v[2]) {
+                        Ok(data) => {
+                            let _package =
+                                packages::set_neopixel(vec![[data.red, data.green, data.blue]]);
+                            json!("Ok: Command received").to_string()
+                        }
+                        Err(err) => json!(format!(
+                            "Error: JSON was not well-formatted. Details: {}",
+                            err
+                        ))
+                        .to_string(),
+                    }
                 } else {
                     json!("Error: Invalid command selected").to_string()
                 }
@@ -208,9 +219,17 @@ fn request_endpoint(request: &str) -> String {
                 "enable" => {
                     let _package: AnsPackage;
                     if v.len() == 4 {
-                        let state: bool = v[3].parse::<bool>().unwrap();
-                        let _package = packages::pwm_enable(state);
-                        json!("Ok: Command received").to_string()
+                        match serde_json::from_str::<ApiPwmEnable>(v[3]) {
+                            Ok(data) => {
+                                let _package = packages::pwm_enable(data.enable);
+                                json!("Ok: Command received").to_string()
+                            }
+                            Err(err) => json!(format!(
+                                "Error: JSON was not well-formatted. Details: {}",
+                                err
+                            ))
+                            .to_string(),
+                        }
                     } else {
                         json!("Error: Invalid command selected").to_string()
                     }
@@ -219,23 +238,36 @@ fn request_endpoint(request: &str) -> String {
                 "frequency" => {
                     let _package: AnsPackage;
                     if v.len() == 4 {
-                        let freq: f32 = v[3].parse::<f32>().unwrap();
-                        let _package = packages::set_pwm_freq_hz(freq);
-                        json!("Ok: Command received").to_string()
+                        match serde_json::from_str::<ApiPwmFrequency>(v[3]) {
+                            Ok(data) => {
+                                let _package = packages::set_pwm_freq_hz(data.frequency);
+                                json!("Ok: Command received").to_string()
+                            }
+                            Err(err) => json!(format!(
+                                "Error: JSON was not well-formatted. Details: {}",
+                                err
+                            ))
+                            .to_string(),
+                        }
                     } else {
                         json!("Error: Invalid command selected").to_string()
                     }
                 }
                 _ => {
                     let _package: AnsPackage;
-                    if v.len() == 4 {
-                        let value: u16 = v[3].parse::<u16>().unwrap();
-
-                        let _package = packages::pwm_channel_value(
-                            hardware_manager::PwmChannel::from_str(v[2]).unwrap(),
-                            value,
-                        );
-                        json!("Ok: Command received").to_string()
+                    if v.len() == 5 {
+                        match serde_json::from_str::<ApiPwmChannelValue>(v[4]) {
+                            Ok(data) => {
+                                let _package =
+                                    packages::pwm_channel_value(data.channel, data.value);
+                                json!("Ok: Command received").to_string()
+                            }
+                            Err(err) => json!(format!(
+                                "Error: JSON was not well-formatted. Details: {}",
+                                err
+                            ))
+                            .to_string(),
+                        }
                     } else {
                         json!("Error: Invalid command selected").to_string()
                     }

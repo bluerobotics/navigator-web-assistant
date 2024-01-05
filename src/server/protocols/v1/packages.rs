@@ -147,18 +147,6 @@ pub fn set_led(select: hardware_manager::UserLed, state: bool) -> AnsPackage {
     }))
 }
 
-pub fn get_led(select: hardware_manager::UserLed) -> AnsPackage {
-    let state = hardware_manager::get_led(select.clone());
-    let user_led = UserLED {
-        channel: (vec![select]),
-        value: (vec![state]),
-    };
-    AnsPackage::new(Operation::Output(OutputRequest {
-        timestamp: (chrono::Utc::now().to_string()),
-        output: vec![OutputDevices::UserLED(user_led)],
-    }))
-}
-
 pub fn get_led_all() -> AnsPackage {
     let mut user_led = UserLED {
         channel: (vec![]),
