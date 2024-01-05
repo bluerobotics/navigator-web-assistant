@@ -1,9 +1,12 @@
 use crate::{
-    hardware_manager::{self, UserLed},
+    hardware_manager::{self},
     server::protocols::v1::{
         errors::Error,
         packages,
-        structures::{AnsPackage, ServerMetadata},
+        structures::{
+            AnsPackage, ApiNeopixel, ApiPwmChannelValue, ApiPwmEnable, ApiPwmFrequency, ApiUserLed,
+            ServerMetadata,
+        },
     },
 };
 use actix_web::Responder;
@@ -11,46 +14,14 @@ use mime_guess::from_path;
 use paperclip::actix::{
     api_v2_operation, get, post,
     web::{self, HttpResponse, Json},
-    Apiv2Schema,
 };
-use serde::{Deserialize, Serialize};
+
 use std::vec;
 use validator::Validate;
 
 #[derive(rust_embed::RustEmbed)]
 #[folder = "src/server/protocols/v1/frontend"]
 struct Asset;
-
-#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
-pub struct ApiNeopixel {
-    red: u8,
-    green: u8,
-    blue: u8,
-}
-
-#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
-pub struct ApiPwmEnable {
-    enable: bool,
-}
-
-#[derive(Apiv2Schema, Debug, Deserialize, Serialize, Validate)]
-pub struct ApiPwmChannelValue {
-    channel: hardware_manager::PwmChannel,
-    #[validate(range(min = 0, max = 4096))]
-    value: u16,
-}
-
-#[derive(Apiv2Schema, Debug, Deserialize, Serialize, Validate)]
-pub struct ApiPwmFrequency {
-    #[validate(range(min = 24, max = 1526))]
-    frequency: f32,
-}
-
-#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
-pub struct ApiUserLed {
-    userled: UserLed,
-    value: bool,
-}
 
 fn handle_embedded_file(path: &str) -> HttpResponse {
     match Asset::get(path) {

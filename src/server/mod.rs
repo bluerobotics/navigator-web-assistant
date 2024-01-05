@@ -2,10 +2,6 @@ use actix_web::{middleware, App, HttpServer};
 use paperclip::actix::OpenApiExt;
 pub mod protocols;
 
-#[derive(rust_embed::RustEmbed)]
-#[folder = "src/server/protocols/v1/frontend"]
-struct Asset;
-
 pub async fn run() -> std::io::Result<()> {
     log::info!("starting HTTP server at http://localhost:8080");
 
