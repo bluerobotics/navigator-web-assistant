@@ -3,6 +3,7 @@ use crate::server::protocols::v1::websocket;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct AnsPackage {
@@ -56,6 +57,38 @@ pub struct Pwm {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enable: Option<bool>,
 }
+
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
+pub struct ApiNeopixel {
+    pub red: u8,
+    pub green: u8,
+    pub blue: u8,
+}
+
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
+pub struct ApiPwmEnable {
+    pub enable: bool,
+}
+
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize, Validate)]
+pub struct ApiPwmChannelValue {
+    pub channel: hardware_manager::PwmChannel,
+    #[validate(range(min = 0, max = 4096))]
+    pub value: u16,
+}
+
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize, Validate)]
+pub struct ApiPwmFrequency {
+    #[validate(range(min = 24, max = 1526))]
+    pub frequency: f32,
+}
+
+#[derive(Apiv2Schema, Debug, Deserialize, Serialize)]
+pub struct ApiUserLed {
+    pub userled: hardware_manager::UserLed,
+    pub value: bool,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserLED {
     pub channel: Vec<hardware_manager::UserLed>,
