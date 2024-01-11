@@ -71,11 +71,17 @@ Users can send commands like the restAPI routes, try:
 ```
 /input/all
 ```
+For POST methods define the structures after, as follows:
+```
+/output/pwm/channel/value/{ "channel": "Ch9", "value": 10 }
+```
 Multiple commands can be sent, just use the '&&', try:
 ```
-/output/userled/led1/true &&
-/output/neopixel/100/100/0
+/output/pwm/enable/{ "enable": false } &&
+/output/pwm/frequency/{ "frequency": 60 } &&
 
-&& /output/pwm/enable/false
+/output/pwm/channel/value/{ "channel": "Ch9", "value": 1000 } &&
+/output/pwm/channel/value/{ "channel": "Ch10", "value": 3000 } &&
+/output/pwm/enable/{ "enable": true }
 ```
 The requests will work even with inner trailing spaces.
