@@ -255,6 +255,33 @@
                   document.getElementById("frequency-slider").value =
                     output.PWM.frequency;
                 }
+                if (
+                  output.NeoPixel !== undefined &&
+                  Array.isArray(output.NeoPixel.value) &&
+                  output.NeoPixel.value.length > 0 &&
+                  output.NeoPixel.value[0].red !== undefined &&
+                  output.NeoPixel.value[0].green !== undefined &&
+                  output.NeoPixel.value[0].blue !== undefined
+                ) {
+                  document.getElementById("red-slider").value =
+                    output.NeoPixel.value[0].red;
+                  document.getElementById("green-slider").value =
+                    output.NeoPixel.value[0].green;
+                  document.getElementById("blue-slider").value =
+                    output.NeoPixel.value[0].blue;
+                }
+                if (output.UserLED !== undefined) {
+                  const channelValues = output.UserLED.value;
+
+                  // Update LED checkboxes based on channel values
+                  channelValues.forEach((value, index) => {
+                    const channel = output.UserLED.channel[index];
+                    const checkbox = document.getElementById(
+                      `user-${channel.toLowerCase()}-checkbox`
+                    );
+                    checkbox.checked = value;
+                  });
+                }
               });
             }
 
