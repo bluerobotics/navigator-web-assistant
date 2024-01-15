@@ -405,6 +405,56 @@
         }
       }
 
+      function updateNeopixelLEDColor() {
+        const red = document.getElementById("red-slider").value;
+        const green = document.getElementById("green-slider").value;
+        const blue = document.getElementById("blue-slider").value;
+
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            // Prepare the message
+            const message = `/output/neopixel/{ "red": ${red}, "green": ${green}, "blue": ${blue} }`;
+
+            // Send the message
+            ws.send(message);
+
+            // Log that the message has been sent
+            console.log("WebSocket message sent:", message);
+          } catch (error) {
+            console.error("Error sending WebSocket message:", error);
+          }
+        } else {
+          console.warn(
+            "WebSocket connection is not open. Unable to send message."
+          );
+        }
+      }
+
+      function updateUserLEDColor(channel) {
+        box = document.getElementById(`user-${channel.toLowerCase()}-checkbox`);
+
+        Led_value = box.checked;
+
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            // Prepare the message
+            const message = `/output/userled/{ "userled": "${channel}", "value": ${Led_value} }`;
+
+            // Send the message
+            ws.send(message);
+
+            // Log that the message has been sent
+            console.log("WebSocket message sent:", message);
+          } catch (error) {
+            console.error("Error sending WebSocket message:", error);
+          }
+        } else {
+          console.warn(
+            "WebSocket connection is not open. Unable to send message."
+          );
+        }
+      }
+
       function updateSensorReadings() {
         const sensorTable = document.getElementById("sensor-table");
         sensorTable.innerHTML = ""; // Clear previous readings
