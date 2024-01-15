@@ -483,10 +483,13 @@
         const day = timestamp.getDate();
         const month = timestamp.getMonth() + 1; // Month is zero-based
         const year = timestamp.getFullYear();
-        const hour = timestamp.getHours().toString().padStart(2, '0');
-        const minute = timestamp.getMinutes().toString().padStart(2, '0');
-        const second = timestamp.getSeconds().toString().padStart(2, '0');
-        const milisecond = timestamp.getMilliseconds().toString().padStart(3, '0');
+        const hour = timestamp.getHours().toString().padStart(2, "0");
+        const minute = timestamp.getMinutes().toString().padStart(2, "0");
+        const second = timestamp.getSeconds().toString().padStart(2, "0");
+        const milisecond = timestamp
+          .getMilliseconds()
+          .toString()
+          .padStart(3, "0");
 
         lastUpdateTimestamp.innerHTML = `
                             Date: ${day}/${month}/${year}<br>
@@ -535,10 +538,12 @@
         .getElementById("update-interval")
         .addEventListener("input", handleUpdateCheckboxChange);
 
-      document.getElementById('RestAPI-button').addEventListener('click', function() {
-      // Navigate to the /docs page
-      window.location.href = '/docs';
-      });
+      document
+        .getElementById("RestAPI-button")
+        .addEventListener("click", function () {
+          // Navigate to the /docs page
+          window.location.href = "/docs";
+        });
 
       const channelContainer = document.getElementById("channel-container");
 
