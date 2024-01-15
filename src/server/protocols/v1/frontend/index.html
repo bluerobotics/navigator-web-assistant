@@ -123,16 +123,90 @@
           </fieldset>
         </td>
         <tr>
-          <td colspan="2">
-              <fieldset>
-                  <legend>Documentation</legend>
-                      <h2>Read the REST API docs</h2>
-                      <p>Explore the documentation and learn more about the RESTful API and how you easy you can develop webapps for navigator</p>
-                      <button id="RestAPI-button">REST API</button>
-              </fieldset>
+          <td>
+            <fieldset>
+              <legend>LEDs</legend>
+              <table>
+                <tr>
+                  <td>
+                    <fieldset>
+                      <legend>RGB LEDs</legend>
+                      <label for="red-slider">Red:</label>
+                      <input
+                        type="range"
+                        id="red-slider"
+                        min="0"
+                        max="255"
+                        step="1"
+                        value="0"
+                        oninput="updateNeopixelLEDColor()"
+                      />
+                      <br />
+                      <label for="green-slider">Green:</label>
+                      <input
+                        type="range"
+                        id="green-slider"
+                        min="0"
+                        max="255"
+                        step="1"
+                        value="0"
+                        oninput="updateNeopixelLEDColor()"
+                      />
+                      <br />
+                      <label for="blue-slider">Blue:</label>
+                      <input
+                        type="range"
+                        id="blue-slider"
+                        min="0"
+                        max="255"
+                        step="1"
+                        value="0"
+                        oninput="updateNeopixelLEDColor()"
+                      />
+                    </fieldset>
+                  </td>
+                  <td>
+                    <fieldset>
+                      <legend>User LEDs</legend>
+                      <label for="user-led3-checkbox">Red:</label>
+                      <input
+                        type="checkbox"
+                        id="user-led3-checkbox"
+                        onchange="updateUserLEDColor('Led3')"
+                      />
+                      <br />
+                      <label for="user-led1-checkbox">Green:</label>
+                      <input
+                        type="checkbox"
+                        id="user-led1-checkbox"
+                        onchange="updateUserLEDColor('Led1')"
+                      />
+                      <br />
+                      <label for="user-led2-checkbox">Blue:</label>
+                      <input
+                        type="checkbox"
+                        id="user-led2-checkbox"
+                        onchange="updateUserLEDColor('Led2')"
+                      />
+                    </fieldset>
+                  </td>
+                </tr>
+              </table>
+            </fieldset>
+          </td>
+
+          <td>
+            <fieldset>
+              <legend>Documentation</legend>
+              <h2>Read the REST API docs</h2>
+              <p>
+                Explore the documentation and learn more about the RESTful API
+                and how you easy you can develop webapps for navigator
+              </p>
+              <button id="RestAPI-button">REST API</button>
+            </fieldset>
           </td>
         </tr>
-
       </table>
     </fieldset>
 
@@ -180,6 +254,33 @@
                 ) {
                   document.getElementById("frequency-slider").value =
                     output.PWM.frequency;
+                }
+                if (
+                  output.NeoPixel !== undefined &&
+                  Array.isArray(output.NeoPixel.value) &&
+                  output.NeoPixel.value.length > 0 &&
+                  output.NeoPixel.value[0].red !== undefined &&
+                  output.NeoPixel.value[0].green !== undefined &&
+                  output.NeoPixel.value[0].blue !== undefined
+                ) {
+                  document.getElementById("red-slider").value =
+                    output.NeoPixel.value[0].red;
+                  document.getElementById("green-slider").value =
+                    output.NeoPixel.value[0].green;
+                  document.getElementById("blue-slider").value =
+                    output.NeoPixel.value[0].blue;
+                }
+                if (output.UserLED !== undefined) {
+                  const channelValues = output.UserLED.value;
+
+                  // Update LED checkboxes based on channel values
+                  channelValues.forEach((value, index) => {
+                    const channel = output.UserLED.channel[index];
+                    const checkbox = document.getElementById(
+                      `user-${channel.toLowerCase()}-checkbox`
+                    );
+                    checkbox.checked = value;
+                  });
                 }
               });
             }
@@ -304,6 +405,56 @@
         }
       }
 
+      function updateNeopixelLEDColor() {
+        const red = document.getElementById("red-slider").value;
+        const green = document.getElementById("green-slider").value;
+        const blue = document.getElementById("blue-slider").value;
+
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            // Prepare the message
+            const message = `/output/neopixel/{ "red": ${red}, "green": ${green}, "blue": ${blue} }`;
+
+            // Send the message
+            ws.send(message);
+
+            // Log that the message has been sent
+            console.log("WebSocket message sent:", message);
+          } catch (error) {
+            console.error("Error sending WebSocket message:", error);
+          }
+        } else {
+          console.warn(
+            "WebSocket connection is not open. Unable to send message."
+          );
+        }
+      }
+
+      function updateUserLEDColor(channel) {
+        box = document.getElementById(`user-${channel.toLowerCase()}-checkbox`);
+
+        Led_value = box.checked;
+
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            // Prepare the message
+            const message = `/output/userled/{ "userled": "${channel}", "value": ${Led_value} }`;
+
+            // Send the message
+            ws.send(message);
+
+            // Log that the message has been sent
+            console.log("WebSocket message sent:", message);
+          } catch (error) {
+            console.error("Error sending WebSocket message:", error);
+          }
+        } else {
+          console.warn(
+            "WebSocket connection is not open. Unable to send message."
+          );
+        }
+      }
+
       function updateSensorReadings() {
         const sensorTable = document.getElementById("sensor-table");
         sensorTable.innerHTML = ""; // Clear previous readings
@@ -332,10 +483,13 @@
         const day = timestamp.getDate();
         const month = timestamp.getMonth() + 1; // Month is zero-based
         const year = timestamp.getFullYear();
-        const hour = timestamp.getHours().toString().padStart(2, '0');
-        const minute = timestamp.getMinutes().toString().padStart(2, '0');
-        const second = timestamp.getSeconds().toString().padStart(2, '0');
-        const milisecond = timestamp.getMilliseconds().toString().padStart(3, '0');
+        const hour = timestamp.getHours().toString().padStart(2, "0");
+        const minute = timestamp.getMinutes().toString().padStart(2, "0");
+        const second = timestamp.getSeconds().toString().padStart(2, "0");
+        const milisecond = timestamp
+          .getMilliseconds()
+          .toString()
+          .padStart(3, "0");
 
         lastUpdateTimestamp.innerHTML = `
                             Date: ${day}/${month}/${year}<br>
@@ -384,10 +538,12 @@
         .getElementById("update-interval")
         .addEventListener("input", handleUpdateCheckboxChange);
 
-      document.getElementById('RestAPI-button').addEventListener('click', function() {
-      // Navigate to the /docs page
-      window.location.href = '/docs';
-      });
+      document
+        .getElementById("RestAPI-button")
+        .addEventListener("click", function () {
+          // Navigate to the /docs page
+          window.location.href = "/docs";
+        });
 
       const channelContainer = document.getElementById("channel-container");
 
