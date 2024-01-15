@@ -123,16 +123,90 @@
           </fieldset>
         </td>
         <tr>
-          <td colspan="2">
-              <fieldset>
-                  <legend>Documentation</legend>
-                      <h2>Read the REST API docs</h2>
-                      <p>Explore the documentation and learn more about the RESTful API and how you easy you can develop webapps for navigator</p>
-                      <button id="RestAPI-button">REST API</button>
-              </fieldset>
+          <td>
+            <fieldset>
+              <legend>LEDs</legend>
+              <table>
+                <tr>
+                  <td>
+                    <fieldset>
+                      <legend>RGB LEDs</legend>
+                      <label for="red-slider">Red:</label>
+                      <input
+                        type="range"
+                        id="red-slider"
+                        min="0"
+                        max="255"
+                        step="1"
+                        value="0"
+                        oninput="updateNeopixelLEDColor()"
+                      />
+                      <br />
+                      <label for="green-slider">Green:</label>
+                      <input
+                        type="range"
+                        id="green-slider"
+                        min="0"
+                        max="255"
+                        step="1"
+                        value="0"
+                        oninput="updateNeopixelLEDColor()"
+                      />
+                      <br />
+                      <label for="blue-slider">Blue:</label>
+                      <input
+                        type="range"
+                        id="blue-slider"
+                        min="0"
+                        max="255"
+                        step="1"
+                        value="0"
+                        oninput="updateNeopixelLEDColor()"
+                      />
+                    </fieldset>
+                  </td>
+                  <td>
+                    <fieldset>
+                      <legend>User LEDs</legend>
+                      <label for="user-led3-checkbox">Red:</label>
+                      <input
+                        type="checkbox"
+                        id="user-led3-checkbox"
+                        onchange="updateUserLEDColor('Led3')"
+                      />
+                      <br />
+                      <label for="user-led1-checkbox">Green:</label>
+                      <input
+                        type="checkbox"
+                        id="user-led1-checkbox"
+                        onchange="updateUserLEDColor('Led1')"
+                      />
+                      <br />
+                      <label for="user-led2-checkbox">Blue:</label>
+                      <input
+                        type="checkbox"
+                        id="user-led2-checkbox"
+                        onchange="updateUserLEDColor('Led2')"
+                      />
+                    </fieldset>
+                  </td>
+                </tr>
+              </table>
+            </fieldset>
+          </td>
+
+          <td>
+            <fieldset>
+              <legend>Documentation</legend>
+              <h2>Read the REST API docs</h2>
+              <p>
+                Explore the documentation and learn more about the RESTful API
+                and how you easy you can develop webapps for navigator
+              </p>
+              <button id="RestAPI-button">REST API</button>
+            </fieldset>
           </td>
         </tr>
-
       </table>
     </fieldset>
 
