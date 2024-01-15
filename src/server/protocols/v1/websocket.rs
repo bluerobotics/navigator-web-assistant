@@ -178,10 +178,10 @@ fn request_endpoint(request: &str) -> String {
         }
         "output" => match v[1] {
             "userled" => {
-                if v.len() == 3 {
+                if v.len() == 2 {
                     let _package = packages::get_led_all();
                     json!("Ok: Command received").to_string()
-                } else if v.len() == 4 {
+                } else if v.len() == 3 {
                     match serde_json::from_str::<ApiUserLed>(v[2]) {
                         Ok(data) => {
                             let _package = packages::set_led(data.userled, data.value);
