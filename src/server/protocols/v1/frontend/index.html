@@ -204,6 +204,18 @@
                 and how you easy you can develop webapps for navigator
               </p>
               <button id="RestAPI-button">REST API</button>
+              <h2>Attention</h2>
+              <p>
+                The Navigator Web Assistant uses its own drivers to communicate
+                with devices. It is highly recommended to disable Autopilot to
+                use it properly.
+              </p>
+              <button id="StartAutopilot-button" onclick="startAutopilot()">
+                Start Autopilot
+              </button>
+              <button id="StopAutopilot-button" onclick="stopAutopilot()">
+                Stop Autopilot
+              </button>
             </fieldset>
           </td>
         </tr>
@@ -495,6 +507,47 @@
                             Date: ${day}/${month}/${year}<br>
                             Time: ${hour}:${minute}:${second}.${milisecond}
                         `;
+      }
+
+      const currentHost = location.hostname;
+      const autopilotPort = 8000;
+
+      function startAutopilot() {
+        fetch(`http://${currentHost}:${autopilotPort}/v1.0/start`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (response.status === 200) {
+              console.log("Autopilot started successfully.");
+            } else {
+              console.error("Failed to start autopilot.");
+            }
+          })
+          .catch((error) => {
+            console.error(`Error starting autopilot: ${error}`);
+          });
+      }
+
+      function stopAutopilot() {
+        fetch(`http://${currentHost}:${autopilotPort}/v1.0/restart`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (response.status === 200) {
+              console.log("Autopilot stopped successfully.");
+            } else {
+              console.error("Failed to stop autopilot.");
+            }
+          })
+          .catch((error) => {
+            console.error(`Error stopping autopilot: ${error}`);
+          });
       }
 
       function handleUpdateCheckboxChange() {

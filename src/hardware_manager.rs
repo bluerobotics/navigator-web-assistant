@@ -101,15 +101,17 @@ impl NavigationManager {
 
             let time_elapsed = time_start.elapsed().as_micros() as u64;
 
-            if time_elapsed > refresh_interval_us {
+            NavigationManager::websocket_broadcast();
+
+            if time_elapsed > (refresh_interval_us * 2) {
                 log::info!("Monitor: Something went wrong, measurements not concluded with reading interval {refresh_interval_us} us, time elapsed: {time_elapsed} us");
                 continue;
             }
 
-            NavigationManager::websocket_broadcast();
-
-            let wait = refresh_interval_us - time_elapsed;
-            thread::sleep(std::time::Duration::from_micros(wait));
+            if refresh_interval_us > time_elapsed {
+                let wait = refresh_interval_us.wrapping_sub(time_elapsed);
+                thread::sleep(std::time::Duration::from_micros(wait as u64));
+            }
         }
     }
 
