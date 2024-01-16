@@ -108,8 +108,11 @@ impl NavigationManager {
 
             NavigationManager::websocket_broadcast();
 
-            let wait = refresh_interval_us - time_elapsed;
-            thread::sleep(std::time::Duration::from_micros(wait));
+            let wait = refresh_interval_us as i64 - time_elapsed as i64;
+
+            if wait > 0 {
+                thread::sleep(std::time::Duration::from_micros(wait as u64));
+            }
         }
     }
 
