@@ -3,6 +3,9 @@
 Navigator WebAssistant is a webserver that interfaces with navigator-rs, the Rust navigator library.
 With this application, users can run a server locally and control navigator from web interfaces (Websocket and RestAPI).
 
+Navigator WebAssistant running on BlueOS:
+![Banner](page/navigator-webassistant-demo.gif)
+
 Navigator WebAssistant is available at BlueOS extensions, try it:
 ```
 blueos.local/tools/extensions-manager
