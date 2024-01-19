@@ -61,8 +61,13 @@ jobs:
     - name: Upload bin
       uses: actions/upload-artifact@v3
       with:
-       name: bin
-       path: dist
+       name: ${{ matrix.TARGET }}
+       path: dist/${{ matrix.TARGET }}
+    - name: Upload bin
+      uses: actions/upload-artifact@v3
+      with:
+        name: bin
+        path: dist
 
   test-local:
    needs: build-bin
