@@ -138,8 +138,8 @@ pub fn set_pwm_freq_hz(freq: f32) -> AnsPackage {
 pub fn set_led(select: hardware_manager::UserLed, state: bool) -> AnsPackage {
     hardware_manager::set_led(select.clone(), state);
     let user_led = UserLED {
-        channel: (vec![select]),
-        value: (vec![state]),
+        channel: vec![select],
+        value: vec![state],
     };
     AnsPackage::new(Operation::Output(OutputRequest {
         timestamp: chrono::Utc::now().to_string(),
@@ -149,8 +149,8 @@ pub fn set_led(select: hardware_manager::UserLed, state: bool) -> AnsPackage {
 
 pub fn get_led_all() -> AnsPackage {
     let mut user_led = UserLED {
-        channel: (vec![]),
-        value: (vec![]),
+        channel: vec![],
+        value: vec![],
     };
 
     for select in hardware_manager::UserLed::iter() {
@@ -159,7 +159,7 @@ pub fn get_led_all() -> AnsPackage {
     }
 
     AnsPackage::new(Operation::Output(OutputRequest {
-        timestamp: (chrono::Utc::now().to_string()),
+        timestamp: chrono::Utc::now().to_string(),
         output: vec![OutputDevices::UserLED(user_led)],
     }))
 }

@@ -34,11 +34,13 @@ pub enum Operation {
     Output(OutputRequest),
     Settings,
 }
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OutputRequest {
     pub timestamp: String,
     pub output: Vec<OutputDevices>,
 }
+
 #[derive(Debug, Serialize, Deserialize)]
 pub enum OutputDevices {
     #[serde(rename = "PWM")]
@@ -46,6 +48,7 @@ pub enum OutputDevices {
     UserLED(UserLED),
     NeoPixel(NeoPixel),
 }
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Pwm {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -94,10 +97,12 @@ pub struct UserLED {
     pub channel: Vec<hardware_manager::UserLed>,
     pub value: Vec<bool>,
 }
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NeoPixel {
     pub value: Vec<NeoPixelRGB>,
 }
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NeoPixelRGB {
     pub red: u8,
