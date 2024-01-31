@@ -7,7 +7,7 @@ mod server;
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let (datalogger_settings, monitor_settings) = cli::parse_args();
-    println!("Starting navigator webservice with: {datalogger_settings:?} {monitor_settings:?}",);
+    log::info!("Starting navigator webservice with: {datalogger_settings:?} {monitor_settings:?}",);
     logger::init();
 
     hardware_manager::init();
