@@ -100,7 +100,7 @@ impl Actor for WebsocketActor {
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebsocketActor {
     fn started(&mut self, ctx: &mut Self::Context) {
-        println!("Starting websocket, add itself in manager.");
+        log::info!("Starting websocket, add itself in manager.");
         self.server
             .lock()
             .unwrap()
@@ -112,7 +112,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebsocketActor {
     }
 
     fn finished(&mut self, ctx: &mut Self::Context) {
-        println!("Finishing websocket, remove itself from manager.");
+        log::info!("Finishing websocket, remove itself from manager.");
         self.server
             .lock()
             .unwrap()
