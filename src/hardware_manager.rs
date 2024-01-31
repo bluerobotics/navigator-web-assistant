@@ -15,6 +15,7 @@ struct NavigationManager {
     monitor: Option<std::thread::JoinHandle<()>>,
     datalogger: Option<std::thread::JoinHandle<()>>,
 }
+
 #[derive(Debug, Clone, Default, Copy)]
 struct Data {
     state: navigator_rs::SensorData,
@@ -139,8 +140,6 @@ impl NavigationManager {
     }
 }
 
-// Help with conversion from navigator enum API to our stable API
-// impl_from_enum!(AdcChannel, navigator_rs::AdcChannel, Ch0, Ch1, Ch2, Ch3);
 impl_from_enum!(
     PwmChannel,
     navigator_rs::PwmChannel,
@@ -162,7 +161,6 @@ impl_from_enum!(
     Ch16,
     All
 );
-// impl_from_enum!(UserLed, navigator_rs::UserLed, Led1, Led2, Led3);
 
 impl From<navigator_rs::AxisData> for AxisData {
     fn from(read_axis: navigator_rs::AxisData) -> Self {
@@ -186,6 +184,7 @@ impl From<navigator_rs::ADCData> for ADCData {
         }
     }
 }
+
 #[derive(Apiv2Schema, Debug, Serialize, Deserialize, Clone)]
 pub enum PwmChannel {
     Ch1,
@@ -206,6 +205,7 @@ pub enum PwmChannel {
     Ch16,
     All,
 }
+
 #[derive(Apiv2Schema, Debug, Serialize, Deserialize, Clone, EnumIter)]
 pub enum UserLed {
     Led1,
@@ -220,6 +220,7 @@ pub struct AxisData {
     y: f32,
     z: f32,
 }
+
 pub struct ADCData {
     channel: [f32; 4],
 }
