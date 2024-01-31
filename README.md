@@ -50,25 +50,25 @@ To change navigator monitor's refresh rate:
 
 To get some access to navigator from web, you can start using the web hosted interface:
 ```
-localhost/8080
+localhost:8080
 ```
 
 ## RestAPI
 
 To get instructions on how to use API routes, access the docs:
 ```
-localhost/8080/docs
+localhost:8080/docs
 ```
 
 ## Websocket
 
 To get access to navigator from websocket:
 ```
-localhost/8080/ws
+localhost:8080/ws
 ```
 An optional regex filter can be applied on the register process, try:
 ```
-localhost/8080/ws?filter=output
+localhost:8080/ws?filter=output
 ```
 Users can send commands like the restAPI routes, try:
 ```
