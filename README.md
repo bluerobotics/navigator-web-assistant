@@ -35,7 +35,7 @@ To enable datalogger service with default values:
 
 To change datalogger service values:
 ```
-./navigator-webassistant --datalogger-rate 0.0017 --datalogger-directory ./ --datalogger-filename data.csv
+./navigator-webassistant --datalogger-rate 1 --datalogger-directory ./ --datalogger-filename data.csv
 ```
 
 To change navigator monitor's refresh rate:
