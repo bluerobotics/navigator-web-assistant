@@ -31,23 +31,27 @@ fn handle_embedded_file(path: &str) -> HttpResponse {
         None => HttpResponse::NotFound().body("404 Not Found"),
     }
 }
+
 #[api_v2_operation(skip)]
 #[get("/")]
 async fn index() -> impl Responder {
     handle_embedded_file("index.html")
 }
+
 #[api_v2_operation]
 #[get("v1/settings/init")]
 async fn init() -> Result<Json<AnsPackage>, Error> {
     let package = packages::init();
     Ok(Json(package))
 }
+
 #[api_v2_operation]
 #[get("v1/input/{sensor}")]
 async fn get_sensor(sensor: web::Path<packages::Sensors>) -> Result<Json<AnsPackage>, Error> {
     let package = packages::reading(sensor.into_inner(), false);
     Ok(Json(package))
 }
+
 #[api_v2_operation]
 #[get("v1/input/{sensor}/cached")]
 async fn get_sensor_cached(
@@ -56,12 +60,14 @@ async fn get_sensor_cached(
     let package = packages::reading(sensor.into_inner(), true);
     Ok(Json(package))
 }
+
 #[api_v2_operation]
 #[get("v1/output/user_led")]
 async fn get_led_all() -> Result<Json<AnsPackage>, Error> {
     let package = packages::get_led_all();
     Ok(Json(package))
 }
+
 #[api_v2_operation]
 #[post("v1/output/user_led")]
 async fn post_led(json: web::Json<ApiUserLed>) -> Result<Json<AnsPackage>, Error> {
@@ -69,6 +75,7 @@ async fn post_led(json: web::Json<ApiUserLed>) -> Result<Json<AnsPackage>, Error
     let package = packages::set_led(userled.userled, userled.value);
     Ok(Json(package))
 }
+
 #[api_v2_operation]
 #[post("v1/output/neopixel")]
 async fn post_neopixel(json: web::Json<ApiNeopixel>) -> Result<Json<AnsPackage>, Error> {
@@ -76,6 +83,7 @@ async fn post_neopixel(json: web::Json<ApiNeopixel>) -> Result<Json<AnsPackage>,
     let package = packages::set_neopixel(vec![[neopixel.red, neopixel.green, neopixel.blue]]);
     Ok(Json(package))
 }
+
 #[api_v2_operation]
 #[post("v1/output/pwm/channel/value")]
 async fn post_pwm(json: web::Json<ApiPwmChannelValue>) -> Result<Json<AnsPackage>, Error> {
@@ -88,6 +96,7 @@ async fn post_pwm(json: web::Json<ApiPwmChannelValue>) -> Result<Json<AnsPackage
         Err(e) => Err(Error::from(e)),
     }
 }
+
 #[api_v2_operation]
 #[post("v1/output/pwm/enable")]
 async fn post_pwm_enable(json: web::Json<ApiPwmEnable>) -> Result<Json<AnsPackage>, Error> {
