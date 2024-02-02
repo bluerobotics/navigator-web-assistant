@@ -14,7 +14,7 @@ And add Navigator WebAssistant Extension. Or manually install from source from t
 
 You can also use the Jupyter extension to try some fast python and websocket applications.
 
-[instructions]: https://github.com/RaulTrombin/blueos-navigator-assitant
+[instructions]: https://github.com/RaulTrombin/blueos-navigator-web-assistant
 ## Instructions
 
 To use Navigator WebAssistant simply execute:
