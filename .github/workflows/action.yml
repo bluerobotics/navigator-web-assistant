@@ -77,12 +77,12 @@ jobs:
    - name: Download bin
      uses: actions/download-artifact@v3
      with:
-      name: bin
+      name: armv7-unknown-linux-gnueabihf
       path: dist
    - name: Run in background
      run: |
-       chmod +x ./dist/armv7-unknown-linux-gnueabihf/navigator-webassistant
-       ./dist/armv7-unknown-linux-gnueabihf/navigator-webassistant > navigator.log 2>&1 &
+       chmod +x ./dist/navigator-webassistant
+       ./dist/navigator-webassistant > navigator.log 2>&1 &
        PID=$!
 
        sleep 10
