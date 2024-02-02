@@ -46,6 +46,12 @@ To change navigator monitor's refresh rate:
 
 *The rate values use Hz.
 
+To use a custom port:
+
+```
+./navigator-webassistant --server-port 8081
+```
+
 ## Webpage
 
 To get some access to navigator from web, you can start using the web hosted interface:
