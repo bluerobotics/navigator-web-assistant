@@ -2,8 +2,8 @@ use actix_web::{middleware, App, HttpServer};
 use paperclip::actix::OpenApiExt;
 pub mod protocols;
 
-pub async fn run() -> std::io::Result<()> {
-    log::info!("starting HTTP server at http://localhost:8080");
+pub async fn run(port: u16) -> std::io::Result<()> {
+    log::info!("starting HTTP server at http://localhost:{port}");
 
     let server = HttpServer::new(|| {
         App::new()
@@ -16,5 +16,5 @@ pub async fn run() -> std::io::Result<()> {
             .build()
     });
 
-    server.bind(("0.0.0.0", 8080))?.run().await
+    server.bind(("0.0.0.0", port))?.run().await
 }

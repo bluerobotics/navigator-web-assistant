@@ -12,7 +12,12 @@ pub struct MonitorSettings {
     pub interval: u64,
 }
 
-pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
+#[derive(Debug)]
+pub struct ServerSettings {
+    pub port: u16,
+}
+
+pub fn parse_args() -> (DataloggerSettings, MonitorSettings, ServerSettings) {
     let matches = Command::new("Navigator Assistant")
         .version("1.0")
         .author("BlueRobotics")
@@ -51,6 +56,12 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
                 .value_parser(clap::value_parser!(bool))
                 .required(false),
         )
+        .arg(
+            Arg::new("server_port")
+                .long("server-port")
+                .value_parser(clap::value_parser!(u16))
+                .required(false),
+        )
         .get_matches();
 
     let datalogger_directory = matches
@@ -83,7 +94,14 @@ pub fn parse_args() -> (DataloggerSettings, MonitorSettings) {
         interval: hz_to_us(monitor_rate),
     };
 
-    (datalogger_settings, monitor_settings)
+    let server_port = matches
+        .get_one::<u16>("server_port")
+        .copied()
+        .unwrap_or(8080);
+
+    let server_settings = ServerSettings { port: server_port };
+
+    (datalogger_settings, monitor_settings, server_settings)
 }
 
 fn hz_to_us(rate_hz: f64) -> u64 {
