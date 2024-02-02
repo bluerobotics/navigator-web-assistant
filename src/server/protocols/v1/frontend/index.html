@@ -228,7 +228,14 @@
       let updateIntervalId;
       let pwmEnabled = false;
 
-      const wsBaseUrl = `ws://${location.host}/ws`; // WebSocket URL
+      let wsBaseUrl;
+      // Check if using HTTPS, then upgrade to wss
+      if (location.protocol === "https:") {
+        wsBaseUrl = `wss://${location.host}/ws`;
+      } else {
+        wsBaseUrl = `ws://${location.host}/ws`;
+      }
+
       let ws; // WebSocket object
       let ws_inputs;
       let ws_inputs_timestampHistory = [];
