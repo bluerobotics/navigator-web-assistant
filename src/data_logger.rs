@@ -1,18 +1,18 @@
 use chrono::{DateTime, Local};
 use std::fs::OpenOptions;
 use std::io::Write;
-use std::path::Path;
+use std::path::PathBuf;
 
 pub struct DataLogger {
     file: std::fs::File,
 }
 
 impl DataLogger {
-    pub fn new(file_name: &str) -> Result<DataLogger, std::io::Error> {
+    pub fn new(file_name: PathBuf) -> Result<DataLogger, std::io::Error> {
         let mut options = OpenOptions::new();
         options.write(true).create(true).append(true);
 
-        let file = if !Path::new(file_name).exists() {
+        let file = if file_name.exists() {
             let mut file = options.open(file_name)?;
             writeln!(
                 &mut file,
