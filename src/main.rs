@@ -22,7 +22,11 @@ async fn main() -> std::io::Result<()> {
         log::info!("starting datalogger...");
         hardware_manager::init_datalogger(
             datalogger_settings.interval,
-            format!("{}/{}", datalogger_settings.directory, datalogger_settings.filename).into()
+            format!(
+                "{}/{}",
+                datalogger_settings.directory, datalogger_settings.filename
+            )
+            .into(),
         );
     }
 

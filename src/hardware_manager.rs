@@ -67,9 +67,7 @@ impl NavigationManager {
         NavigationManager::get_instance().lock().unwrap().datalogger = Some(
             thread::Builder::new()
                 .name("Datalogger".into())
-                .spawn(move || {
-                    NavigationManager::data_logger(refresh_interval, file_path)
-                })
+                .spawn(move || NavigationManager::data_logger(refresh_interval, file_path))
                 .expect("Error: Navigator service: Datalogger can't setup thread"),
         )
     }
@@ -111,7 +109,7 @@ impl NavigationManager {
 
             if refresh_interval_us > time_elapsed {
                 let wait = refresh_interval_us.wrapping_sub(time_elapsed);
-                thread::sleep(std::time::Duration::from_micros(wait as u64));
+                thread::sleep(std::time::Duration::from_micros(wait));
             }
         }
     }
