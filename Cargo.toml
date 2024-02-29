@@ -16,7 +16,7 @@ futures-util = "0.3.29"
 lazy_static = "1.4.0"
 log = "0.4.20"
 mime_guess = "2.0.4"
-navigator-rs = "0.3.0"
+navigator-rs = "=0.3.0"
 paperclip = { version = "0.8.2" , features = ["actix4", "swagger-ui"] }
 regex = "1.10.2"
 rust-embed = "8.1.0"
