@@ -95,3 +95,36 @@ jobs:
        fi
 
        kill $PID
+
+  release-assets:
+    needs: ["test-local"]
+    runs-on: ubuntu-latest
+    if: "startsWith(github.ref, 'refs/tags/')"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - TARGET: armv7-unknown-linux-gnueabihf
+        - TARGET: aarch64-unknown-linux-gnu
+        - TARGET: armv7-unknown-linux-musleabihf
+        - TARGET: aarch64-unknown-linux-musl
+    steps:
+    - name: Download ${{ matrix.TARGET }} artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: ${{ matrix.TARGET }}
+        path: ${{ matrix.TARGET }}
+    - name: Compress Asset
+      run: |
+        sudo apt update
+        sudo apt install -y zip
+        cd ${{ matrix.TARGET }}
+        chmod +x ./navigator-webassistant
+        zip -rT ../${{ matrix.TARGET }}.zip *
+    - name: Upload assets to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{ matrix.TARGET }}.zip
+        tag: ${{ github.ref }}
+        asset_name: ${{ matrix.TARGET }}.zip
