@@ -221,7 +221,7 @@ fn request_endpoint(request: &str) -> String {
                     if v.len() == 4 {
                         match serde_json::from_str::<ApiPwmEnable>(v[3]) {
                             Ok(data) => {
-                                let _package = packages::pwm_enable(data.enable);
+                                let _package = packages::set_pwm_enable(data.enable);
                                 json!("Ok: Command received").to_string()
                             }
                             Err(err) => json!(format!(
