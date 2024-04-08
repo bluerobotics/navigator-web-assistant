@@ -105,8 +105,8 @@ pub fn pwm_channel_value(channel: hardware_manager::PwmChannel, value: u16) -> A
     AnsPackage::new(Operation::Output(package))
 }
 
-pub fn pwm_enable(state: bool) -> AnsPackage {
-    hardware_manager::pwm_enable(state);
+pub fn set_pwm_enable(state: bool) -> AnsPackage {
+    hardware_manager::set_pwm_enable(state);
     let pwm = Pwm {
         channel: None,
         value: None,
