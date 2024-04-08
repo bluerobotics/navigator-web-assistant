@@ -101,7 +101,7 @@ async fn post_pwm(json: web::Json<ApiPwmChannelValue>) -> Result<Json<AnsPackage
 #[post("v1/output/pwm/enable")]
 async fn post_pwm_enable(json: web::Json<ApiPwmEnable>) -> Result<Json<AnsPackage>, Error> {
     let bool = json.into_inner().enable;
-    let package = packages::pwm_enable(bool);
+    let package = packages::set_pwm_enable(bool);
     Ok(Json(package))
 }
 
@@ -112,7 +112,7 @@ async fn post_pwm_frequency(json: web::Json<ApiPwmFrequency>) -> Result<Json<Ans
     match pwm.validate() {
         Ok(_) => {
             let package = packages::set_pwm_freq_hz(pwm.frequency);
-            hardware_manager::pwm_enable(true);
+            hardware_manager::set_pwm_enable(true);
             Ok(Json(package))
         }
         Err(e) => Err(Error::from(e)),
