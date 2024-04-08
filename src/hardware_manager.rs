@@ -92,6 +92,7 @@ impl NavigationManager {
                 accelerometer: lock.navigator.read_accel(),
                 magnetometer: lock.navigator.read_mag(),
                 gyro: lock.navigator.read_gyro(),
+                leak: lock.navigator.read_leak(),
             };
 
             drop(lock);
@@ -307,8 +308,8 @@ pub fn set_pwm_freq_hz(freq: f32) {
     with_navigator!().set_pwm_freq_hz(freq)
 }
 
-pub fn pwm_enable(state: bool) {
-    with_navigator!().pwm_enable(state)
+pub fn set_pwm_enable(state: bool) {
+    with_navigator!().set_pwm_enable(state)
 }
 
 impl From<AxisData> for Vec<f32> {
